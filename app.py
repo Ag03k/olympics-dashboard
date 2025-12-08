@@ -14,6 +14,10 @@ COLORS = {
     'grid_lines': '#e5e7eb'
 }
 
+# OLYMPIC LOGO 
+logo_url = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Olympic_rings_without_rims.svg"
+
+
 # DATASET (GOOGLE SHEETS)
 url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTjamcaGEzOaghNnbCMBlhmx-2h0jleHUnL7pk_oXqAG0okQJfPfWv2UDIroxVDmwW8UtG4S7iRekUB/pub?gid=529418336&single=true&output=csv'
 df = pd.read_csv(url)
@@ -199,9 +203,19 @@ app.index_string = '''
 
 app.layout = html.Div(
     [
+
         # HEADER
         html.Div(
             [
+                # LOGO
+                html.Img(
+                    src=logo_url,
+                    style={
+                        'height': '65px',
+                        'marginRight': '20px'
+                    }
+                ),
+
                 html.H1(
                     'Olympics History Dashboard',
                     style={
@@ -220,6 +234,7 @@ app.layout = html.Div(
                     }
                 )
             ],
+
             style={
                 'backgroundColor': COLORS['dark_bg'],
                 'padding': '30px 20px 16px 20px',
@@ -228,6 +243,9 @@ app.layout = html.Div(
             }
             
         ),
+
+        
+        
 
         # TABS
         dcc.Tabs(
