@@ -60,7 +60,6 @@ def create_stat_card(label, value, icon_char="📊"):
             'padding': '26px 20px',
             'borderRadius': '12px',
             'textAlign': 'center',
-            'border': f'1px solid {COLORS["grid_lines"]}',
             'minWidth': '230px',
             'width': '100%',
             'boxSizing': 'border-box',
@@ -85,7 +84,7 @@ GRAPH_CARD_STYLE = {
 app = Dash(__name__)
 server = app.server   # REQUIRED FOR RENDER
 
-
+app.title = "Olympics Dashboard"
  
 app.index_string = """<!DOCTYPE html>
 <html>
@@ -227,6 +226,7 @@ app.layout = html.Div(
                 'borderBottom': f'1px solid {COLORS["grid_lines"]}',
                 'marginBottom': '0px'
             }
+            
         ),
 
         # TABS
@@ -451,47 +451,91 @@ app.layout = html.Div(
                                             style={'fontSize': '14px', 'color': '#4b5563'}
                                         ),
 
+                                        # DATASET SECTION
+                                        html.H3("📂 Data source", style={'marginTop': '24px'}),
+                                        html.Ul(
+                                            [
+                                                html.Li(
+                                                    [
+                                                        html.Span("Dataset: ", style={'fontWeight': '600'}),
+                                                        html.A(
+                                                            "athlete_events.csv",
+                                                            href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTjamcaGEzOaghNnbCMBlhmx-2h0jleHUnL7pk_oXqAG0okQJfPfWv2UDIroxVDmwW8UtG4S7iRekUB/pub?gid=529418336&single=true&output=csv",
+                                                            target="_blank",
+                                                            style={'color': '#2563eb', 'textDecoration': 'none'}
+                                                        )
+                                                    ]
+                                                ),
+                                                html.Li(
+                                                    [
+                                                        html.Span("Source: ", style={'fontWeight': '600'}),
+                                                        html.A(
+                                                            "Kaggle – 120 Years of Olympic History: Athletes and Results",
+                                                            href="https://www.kaggle.com/datasets/heesoo37/120-years-of-olympic-history-athletes-and-results",
+                                                            target="_blank",
+                                                            style={'color': '#2563eb', 'textDecoration': 'none'}
+                                                        )
+                                                    ]
+                                                ),
+                                                html.Li(
+                                                    "Description: Each row represents an athlete competing in a single event, "
+                                                    "with demographics (Name, Sex, Age, Height, Weight), team information (Team, NOC), "
+                                                    "and event details (Games, Year, Season, City, Sport, Event, Medal).",
+                                                )
+                                            ],
+                                            style={'fontSize': '14px', 'color': '#4b5563'}
+                                        ),
+
+                                        # HOW TO USE IT
                                         html.H3("🧭 How to use it", style={'marginTop': '24px'}),
                                         html.Ul(
                                             [
                                                 html.Li("🎚️ Use the Year Range slider to focus on specific Olympic eras."),
                                                 html.Li("🏅 Switch the Season dropdown between All, Summer, and Winter Games."),
-                                                html.Li("🖱️ Hover over lines, bars, and boxes to see exact values and compare genders."),
-                                                html.Li("📌 Look at the annotations to quickly spot outliers or interesting patterns.")
+                                                html.Li("🖱️ Hover over lines, bars, and box plots to see exact values and compare genders."),
+                                                html.Li("📌 Look at the annotations to quickly spot outliers, regime changes, or interesting patterns."),
                                             ],
                                             style={'fontSize': '14px', 'color': '#4b5563'}
                                         ),
 
+                                        # DESIGN CHOICES
                                         html.H3("🎨 Design choices", style={'marginTop': '24px'}),
                                         html.Ul(
                                             [
-                                                html.Li("👀 Color: Blue vs gold for gender is chosen as a colorblind-safe pair, "
-                                                        "and all charts were checked with Deuteranopia and Protanopia simulators."),
-                                                html.Li("🔗 Interactivity: The same shared filters drive all six visualizations so users can compare "
-                                                        "patterns across charts for the same time window."),
-                                                html.Li("📝 Annotations and titles highlight non-obvious findings, such as the 1980 boycott "
-                                                        "effect and differences in age profiles by sport."),
-                                                html.Li("🧼 Layout: Rounded cards, consistent typography, and generous spacing keep the app readable and scannable.")
+                                                html.Li(
+                                                    "👀 Color: Blue vs. gold is used as a colorblind-safe pair for gender, and all charts were "
+                                                    "checked under Deuteranopia and Protanopia simulations."
+                                                ),
+                                                html.Li(
+                                                    "🔗 Shared filters: A single year range and season filter drive all six visualizations so that "
+                                                    "users can compare patterns across multiple views for the same slice of time."
+                                                ),
+                                                html.Li(
+                                                    "📝 Annotations: Key moments like the 1980 Moscow Games and clear body-profile clusters are "
+                                                    "called out explicitly so users don’t have to infer everything from the raw marks."
+                                                ),
+                                                html.Li(
+                                                    "🧼 Layout: Card-based sections, consistent typography, and controlled grid lines are used to keep "
+                                                    "the dashboard readable rather than overwhelming."
+                                                ),
                                             ],
                                             style={'fontSize': '14px', 'color': '#4b5563'}
                                         ),
 
-                                        html.H3("💡 Example insights to mention in the walkthrough", style={'marginTop': '24px'}),
+                                        # EXAMPLE INSIGHTS
+                                        html.H3("💡 Example insights to explore", style={'marginTop': '24px'}),
                                         html.Ul(
                                             [
-                                                html.Li("📈 Female participation catching up over time, with a visible jump around 1980."),
+                                                html.Li("📈 Female participation catches up sharply after the late 20th century, with a visible jump around 1980."),
                                                 html.Li("🥊 Combat sports (e.g., boxing, wrestling) tend to have older athletes than artistic sports (e.g., gymnastics)."),
                                                 html.Li("🎯 Medalists cluster in a narrower age band than non-medalists, especially in peak-performance events."),
-                                                html.Li("🏊‍♂️ The height–weight heatmap reveals distinct body clusters (e.g., swimmers vs gymnasts).")
+                                                html.Li("🏊‍♂️ The height–weight heatmap reveals distinct body clusters (e.g., swimmers vs. gymnasts)."),
+                                                html.Li("🌍 A small set of NOCs consistently dominate medal counts, while participation is much more globally distributed."),
+                                                html.Li("📏 Over time, average athlete height and weight slowly increase, especially in power and endurance sports."),
+                                                html.Li("❄️ Winter sports show different age and body profiles compared to Summer sports when you filter by season."),
                                             ],
                                             style={'fontSize': '14px', 'color': '#4b5563'}
                                         ),
-
-                                        html.P(
-                                            "This tab is mainly here for context: if someone lands on the app without the assignment, "
-                                            "they can still understand what they’re looking at and how to interpret it.",
-                                            style={'marginTop': '20px', 'fontSize': '13px', 'color': '#6b7280'}
-                                        )
                                     ],
                                     style={
                                         'backgroundColor': '#ffffff',
@@ -499,7 +543,7 @@ app.layout = html.Div(
                                         'borderRadius': '16px',
                                         'border': f'1px solid {COLORS["grid_lines"]}',
                                         'boxShadow': '0 8px 20px rgba(15, 23, 42, 0.06)',
-                                        'maxWidth': '900px',
+                                        'maxWidth': '1040px',   # widened a bit
                                         'margin': '24px auto'
                                     }
                                 )
@@ -508,21 +552,24 @@ app.layout = html.Div(
                         )
                     ]
                 ),
+
             ],
             className="custom-tabs",
-            # ⬇ small margin below the tab bar
+
             style={'padding': '0 20px', 'marginBottom': '8px', 'marginTop': '4px'}
         )
 
     ],
+    
     style={
         'backgroundColor': COLORS['dark_bg'],
         'color': COLORS['text_white'],
         'fontFamily': 'Arial, sans-serif',
         'minHeight': '100vh',
-        'width': '100vw',
+        'width': '100%',          
+        'maxWidth': '1400px',     
         'padding': '0',
-        'margin': '0 auto',
+        'margin': '0 auto',       
         'boxSizing': 'border-box'
     }
 )
