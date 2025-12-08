@@ -13,8 +13,7 @@ COLORS = {
     'text_white': '#111827',
     'grid_lines': '#e5e7eb'
 }
-
-# OLYMPIC LOGO 
+# OLYMPIC LOGO
 logo_url = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Olympic_rings_without_rims.svg"
 
 
@@ -482,7 +481,7 @@ app.layout = html.Div(
                                                     target="_blank",
                                                     style={'color': '#2563eb', 'textDecoration': 'none'}
                                                 ),
-                                                html.Span("  •  "),
+                                                html.Span("    •    "),
                                                 html.Strong("Source: "),
                                                 html.A(
                                                     "Kaggle – 120 Years of Olympic History: Athletes and Results",
@@ -543,7 +542,7 @@ app.layout = html.Div(
                                         'borderRadius': '16px',
                                         'border': f'1px solid {COLORS["grid_lines"]}',
                                         'boxShadow': '0 8px 20px rgba(15, 23, 42, 0.06)',
-                                        'maxWidth': '1040px',
+                                        'maxWidth': '1400',
                                         'margin': '24px auto'
                                     }
                                 )
