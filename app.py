@@ -640,7 +640,7 @@ def update_all_charts(year_range, season):
         fig1.add_annotation(
             x=1980,
             y=participation_data[participation_data['Year'] == 1980]['Count'].max(),
-            text="1980 Moscow Boycott:<br>Female participation surge",
+            text="1980 Moscow Boycott:<br>Huge participation surge",
             showarrow=True,
             arrowhead=2,
             arrowcolor=COLORS['accent_gold'],
