@@ -445,94 +445,76 @@ app.layout = html.Div(
                                 html.Div(
                                     [
                                         html.H2("📊 About this dashboard", style={'marginBottom': '12px'}),
+
                                         html.P(
-                                            "This dashboard uses the historical Olympics athlete dataset (1896–2016) "
-                                            "to explore how participation, body profiles, and medal outcomes have evolved over time.",
+                                            "This interactive dashboard explores how Olympic athletes have changed over 120 years — "
+                                            "who participates, how their body profiles differ across sports, and how these patterns "
+                                            "relate to medal outcomes.",
                                             style={'fontSize': '14px', 'color': '#4b5563'}
                                         ),
 
                                         # DATASET SECTION
-                                        html.H3("📂 Data source", style={'marginTop': '24px'}),
-                                        html.Ul(
+                                        html.H3("📂 Data", style={'marginTop': '24px', 'marginBottom': '8px'}),
+                                        html.P(
                                             [
-                                                html.Li(
-                                                    [
-                                                        html.Span("Dataset: ", style={'fontWeight': '600'}),
-                                                        html.A(
-                                                            "athlete_events.csv",
-                                                            href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTjamcaGEzOaghNnbCMBlhmx-2h0jleHUnL7pk_oXqAG0okQJfPfWv2UDIroxVDmwW8UtG4S7iRekUB/pub?gid=529418336&single=true&output=csv",
-                                                            target="_blank",
-                                                            style={'color': '#2563eb', 'textDecoration': 'none'}
-                                                        )
-                                                    ]
+                                                html.Strong("Dataset: "),
+                                                html.A(
+                                                    "athlete_events.csv",
+                                                    href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTjamcaGEzOaghNnbCMBlhmx-2h0jleHUnL7pk_oXqAG0okQJfPfWv2UDIroxVDmwW8UtG4S7iRekUB/pub?gid=529418336&single=true&output=csv",
+                                                    target="_blank",
+                                                    style={'color': '#2563eb', 'textDecoration': 'none'}
                                                 ),
-                                                html.Li(
-                                                    [
-                                                        html.Span("Source: ", style={'fontWeight': '600'}),
-                                                        html.A(
-                                                            "Kaggle – 120 Years of Olympic History: Athletes and Results",
-                                                            href="https://www.kaggle.com/datasets/heesoo37/120-years-of-olympic-history-athletes-and-results",
-                                                            target="_blank",
-                                                            style={'color': '#2563eb', 'textDecoration': 'none'}
-                                                        )
-                                                    ]
-                                                ),
-                                                html.Li(
-                                                    "Description: Each row represents an athlete competing in a single event, "
-                                                    "with demographics (Name, Sex, Age, Height, Weight), team information (Team, NOC), "
-                                                    "and event details (Games, Year, Season, City, Sport, Event, Medal).",
+                                                html.Span("  •  "),
+                                                html.Strong("Source: "),
+                                                html.A(
+                                                    "Kaggle – 120 Years of Olympic History: Athletes and Results",
+                                                    href="https://www.kaggle.com/datasets/heesoo37/120-years-of-olympic-history-athletes-and-results",
+                                                    target="_blank",
+                                                    style={'color': '#2563eb', 'textDecoration': 'none'}
                                                 )
                                             ],
                                             style={'fontSize': '14px', 'color': '#4b5563'}
                                         ),
 
+                                        html.P(
+                                            [
+                                                "This dataset contains 120 years of data on Olympic athletes and results, spanning from the "
+                                                "1896 Athens Summer Olympics to the 2016 Rio Summer Olympics. It was scraped from ",
+                                                html.Span("sports-reference.com", style={'fontStyle': 'italic'}),
+                                                " in May 2018. Each row represents an athlete competing in a single event, with columns for ",
+                                                html.Strong("athlete demographics "),
+                                                "(Name, Sex, Age, Height, Weight), ",
+                                                html.Strong("team information "),
+                                                "(Team, NOC), and ",
+                                                html.Strong("event details "),
+                                                "(Games, Year, Season, City, Sport, Event, Medal)."
+                                            ],
+                                            style={'fontSize': '14px', 'color': '#4b5563', 'marginTop': '4px'}
+                                        ),
+
                                         # HOW TO USE IT
-                                        html.H3("🧭 How to use it", style={'marginTop': '24px'}),
+                                        html.H3("🧭 How to use this dashboard", style={'marginTop': '24px'}),
                                         html.Ul(
                                             [
                                                 html.Li("🎚️ Use the Year Range slider to focus on specific Olympic eras."),
                                                 html.Li("🏅 Switch the Season dropdown between All, Summer, and Winter Games."),
                                                 html.Li("🖱️ Hover over lines, bars, and box plots to see exact values and compare genders."),
-                                                html.Li("📌 Look at the annotations to quickly spot outliers, regime changes, or interesting patterns."),
+                                                html.Li("📌 Use the annotations to quickly spot outliers, structural breaks, and notable patterns."),
                                             ],
                                             style={'fontSize': '14px', 'color': '#4b5563'}
                                         ),
 
-                                        # DESIGN CHOICES
-                                        html.H3("🎨 Design choices", style={'marginTop': '24px'}),
+                                        # WHAT YOU CAN LEARN
+                                        html.H3("💡 What you can learn here", style={'marginTop': '24px'}),
                                         html.Ul(
                                             [
-                                                html.Li(
-                                                    "👀 Color: Blue vs. gold is used as a colorblind-safe pair for gender, and all charts were "
-                                                    "checked under Deuteranopia and Protanopia simulations."
-                                                ),
-                                                html.Li(
-                                                    "🔗 Shared filters: A single year range and season filter drive all six visualizations so that "
-                                                    "users can compare patterns across multiple views for the same slice of time."
-                                                ),
-                                                html.Li(
-                                                    "📝 Annotations: Key moments like the 1980 Moscow Games and clear body-profile clusters are "
-                                                    "called out explicitly so users don’t have to infer everything from the raw marks."
-                                                ),
-                                                html.Li(
-                                                    "🧼 Layout: Card-based sections, consistent typography, and controlled grid lines are used to keep "
-                                                    "the dashboard readable rather than overwhelming."
-                                                ),
-                                            ],
-                                            style={'fontSize': '14px', 'color': '#4b5563'}
-                                        ),
-
-                                        # EXAMPLE INSIGHTS
-                                        html.H3("💡 Example insights to explore", style={'marginTop': '24px'}),
-                                        html.Ul(
-                                            [
-                                                html.Li("📈 Female participation catches up sharply after the late 20th century, with a visible jump around 1980."),
-                                                html.Li("🥊 Combat sports (e.g., boxing, wrestling) tend to have older athletes than artistic sports (e.g., gymnastics)."),
-                                                html.Li("🎯 Medalists cluster in a narrower age band than non-medalists, especially in peak-performance events."),
-                                                html.Li("🏊‍♂️ The height–weight heatmap reveals distinct body clusters (e.g., swimmers vs. gymnasts)."),
-                                                html.Li("🌍 A small set of NOCs consistently dominate medal counts, while participation is much more globally distributed."),
-                                                html.Li("📏 Over time, average athlete height and weight slowly increase, especially in power and endurance sports."),
-                                                html.Li("❄️ Winter sports show different age and body profiles compared to Summer sports when you filter by season."),
+                                                html.Li("📈 How female participation catches up over the 20th century, with a visible inflection around 1980."),
+                                                html.Li("🌍 Which NOCs dominate the medal table versus which countries contribute most to overall participation."),
+                                                html.Li("🥊 How combat sports (e.g., boxing, wrestling) tend to have older athletes than artistic sports (e.g., gymnastics)."),
+                                                html.Li("🎯 How medalists cluster in a narrower age band than non-medalists, especially in peak-performance events."),
+                                                html.Li("🏊‍♂️ How the height–weight heatmap reveals distinct body clusters for different sport ‘types’ (e.g., swimmers vs. gymnasts)."),
+                                                html.Li("📏 How average height and weight of athletes drift upward over time, particularly in power and endurance events."),
+                                                html.Li("❄️ How Winter vs. Summer Games differ when you filter by season — in age, body metrics, and participation volume."),
                                             ],
                                             style={'fontSize': '14px', 'color': '#4b5563'}
                                         ),
@@ -543,7 +525,7 @@ app.layout = html.Div(
                                         'borderRadius': '16px',
                                         'border': f'1px solid {COLORS["grid_lines"]}',
                                         'boxShadow': '0 8px 20px rgba(15, 23, 42, 0.06)',
-                                        'maxWidth': '1040px',   # widened a bit
+                                        'maxWidth': '1040px',
                                         'margin': '24px auto'
                                     }
                                 )
