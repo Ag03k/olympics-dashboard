@@ -7,7 +7,7 @@ athlete-event rows.
 
 This is the **rebuild** branch: a static Vite + TypeScript site that replaces the original Plotly Dash app.
 
-- **Live preview:** _TBD (Render static site `atlas-of-olympians-rebuild`)_
+- **Live preview:** https://atlas-of-olympians-rebuild.onrender.com (free Render static site `atlas-of-olympians-rebuild`, auto-deploys from `rebuild`)
 - The legacy Dash app (`app.py`, `requirements.txt`, `Procfile.txt`) is still in this branch, untouched, for reference.
   The `main` branch and atlas-of-olympians.onrender.com are unchanged.
 
