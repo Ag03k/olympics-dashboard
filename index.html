@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Atlas of Olympians · Olympics Dashboard 1896–2026</title>
+    <meta name="description" content="Explore 130 years of Olympic history, from Athens 1896 to Milano-Cortina 2026: participation, medals by nation, athlete height, weight and age, and how the Games have evolved." />
+    <meta name="theme-color" content="#0b0d17" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/data/core.json" as="fetch" type="application/json" crossorigin="anonymous" />
+    <meta property="og:title" content="Atlas of Olympians · Olympics Dashboard 1896–2026" />
+    <meta property="og:description" content="130 years of Olympic history · Athens 1896 → Milano-Cortina 2026" />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="hero" id="top">
+      <picture class="hero__media">
+        <source
+          media="(max-width: 700px)"
+          type="image/webp"
+          srcset="/img/stadium-portrait-800.webp 800w, /img/stadium-portrait-1400.webp 1400w"
+          sizes="82vh"
+        />
+        <source
+          type="image/webp"
+          srcset="/img/stadium-1600.webp 1600w, /img/stadium-2400.webp 2400w, /img/stadium-3200.webp 3200w"
+          sizes="(min-aspect-ratio: 4/1) 100vw, 330vh"
+        />
+        <img
+          src="/img/stadium-1600.webp"
+          width="1600"
+          height="330"
+          alt="Panoramic view of the Panathenaic Stadium in Athens, the marble stadium that hosted the first modern Olympic Games in 1896"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+      <div class="hero__scrim" aria-hidden="true"></div>
+      <div class="hero__lights" aria-hidden="true"></div>
+
+      <div class="hero__inner">
+        <div class="hero__top">
+          <span class="logo-pill">
+            <img src="/img/olympic-rings.svg" alt="Olympic rings" width="342" height="158" />
+          </span>
+          <span class="hero__badge"><i data-icon="stadium"></i>Olympics Dashboard</span>
+        </div>
+
+        <div class="hero__copy">
+          <p class="hero__eyebrow"><span>Athens 1896</span> <span aria-hidden="true">·</span> <span>Milano&#8209;Cortina 2026</span></p>
+          <h1 class="hero__title">Atlas of <span>Olympians</span></h1>
+          <p class="hero__sub">130 years of Olympic history · Athens 1896 → Milano&#8209;Cortina&nbsp;2026</p>
+        </div>
+
+        <div class="hero__strip">
+          <dl class="hero__stats" aria-describedby="hero-scope">
+            <div class="hero-stat">
+              <dt>Games</dt>
+              <dd class="num" id="hero-games">—</dd>
+            </div>
+            <div class="hero-stat">
+              <dt>Athletes</dt>
+              <dd class="num" id="hero-athletes">—</dd>
+            </div>
+            <div class="hero-stat">
+              <dt>Entries</dt>
+              <dd class="num" id="hero-entries">—</dd>
+            </div>
+            <div class="hero-stat">
+              <dt>Medals</dt>
+              <dd class="num" id="hero-medals">—</dd>
+            </div>
+          </dl>
+          <p class="hero__scope" id="hero-scope">Loading the Games…</p>
+        </div>
+      </div>
+      <div class="ring-stripe" aria-hidden="true"></div>
+    </header>
+
+    <nav class="appbar" aria-label="Sections">
+      <div class="appbar__inner">
+        <md-tabs id="tabs" aria-label="Dashboard sections">
+          <md-primary-tab id="tab-overview" inline-icon aria-controls="panel-overview">
+            <md-icon slot="icon"><i data-icon="bar_chart"></i></md-icon>
+            Overview
+          </md-primary-tab>
+          <md-primary-tab id="tab-about" inline-icon aria-controls="panel-about">
+            <md-icon slot="icon"><i data-icon="info"></i></md-icon>
+            About
+          </md-primary-tab>
+        </md-tabs>
+      </div>
+    </nav>
+
+    <main id="main" class="main" tabindex="-1">
+      <!-- ============================== OVERVIEW ============================== -->
+      <section id="panel-overview" class="panel" role="tabpanel" aria-labelledby="tab-overview">
+        <div class="filters-dock">
+          <section class="filters" aria-label="Filters">
+            <div class="filters__years">
+              <div class="filters__row">
+                <span class="filters__label" id="years-label"><i data-icon="calendar_month"></i>Years</span>
+                <output class="filters__value" id="range-text" for="year-slider" aria-live="polite">1980 – 2026</output>
+              </div>
+              <md-slider
+                id="year-slider"
+                range
+                labeled
+                min="1896"
+                max="2026"
+                step="2"
+                value-start="1980"
+                value-end="2026"
+              ></md-slider>
+            </div>
+            <div class="filters__season">
+              <span class="filters__label" id="season-label"><i data-icon="public"></i>Season</span>
+              <md-chip-set id="season-chips" aria-labelledby="season-label">
+                <md-filter-chip label="All" data-season="All" selected></md-filter-chip>
+                <md-filter-chip label="Summer" data-season="Summer"><md-icon slot="icon"><i data-icon="sunny"></i></md-icon></md-filter-chip>
+                <md-filter-chip label="Winter" data-season="Winter"><md-icon slot="icon"><i data-icon="ac_unit"></i></md-icon></md-filter-chip>
+              </md-chip-set>
+            </div>
+          </section>
+        </div>
+
+        <p class="visually-hidden" id="live-status" aria-live="polite"></p>
+
+        <section class="highlights" aria-label="Key statistics">
+          <div class="stat-grid">
+            <article class="stat stat--gold" style="--accent: var(--oly-ring-blue)">
+              <md-elevation></md-elevation><md-ripple></md-ripple>
+              <div class="stat__icon"><i data-icon="trophy"></i></div>
+              <h2 class="stat__label">Number of Sports</h2>
+              <p class="stat__value num" id="stat-sports">—</p>
+              <p class="stat__foot" id="stat-sports-foot">distinct sports</p>
+            </article>
+            <article class="stat stat--silver" style="--accent: var(--oly-ring-yellow)">
+              <md-elevation></md-elevation><md-ripple></md-ripple>
+              <div class="stat__icon"><i data-icon="straighten"></i></div>
+              <h2 class="stat__label">Avg Height <span>(cm)</span></h2>
+              <p class="stat__value num" id="stat-height">—</p>
+              <p class="stat__foot" id="stat-height-foot">entries with height</p>
+            </article>
+            <article class="stat stat--bronze" style="--accent: var(--oly-ring-green)">
+              <md-elevation></md-elevation><md-ripple></md-ripple>
+              <div class="stat__icon"><i data-icon="monitor_weight"></i></div>
+              <h2 class="stat__label">Avg Weight <span>(kg)</span></h2>
+              <p class="stat__value num" id="stat-weight">—</p>
+              <p class="stat__foot" id="stat-weight-foot">entries with weight</p>
+            </article>
+            <article class="stat stat--laurel" style="--accent: var(--oly-ring-red)">
+              <md-elevation></md-elevation><md-ripple></md-ripple>
+              <div class="stat__icon"><i data-icon="cake"></i></div>
+              <h2 class="stat__label">Avg Age <span>(years)</span></h2>
+              <p class="stat__value num" id="stat-age">—</p>
+              <p class="stat__foot" id="stat-age-foot">entries with age</p>
+            </article>
+          </div>
+
+          <article class="podium" aria-labelledby="podium-title">
+            <md-elevation></md-elevation>
+            <header class="podium__head">
+              <div>
+                <p class="kicker"><i data-icon="military_tech"></i>Podium</p>
+                <h2 class="podium__title" id="podium-title">Top nations by medals</h2>
+              </div>
+              <p class="podium__scope" id="podium-scope"></p>
+            </header>
+            <ol class="podium__stage" id="podium-stage">
+              <li class="step step--2" data-rank="2"></li>
+              <li class="step step--1" data-rank="1"></li>
+              <li class="step step--3" data-rank="3"></li>
+            </ol>
+            <p class="podium__empty" id="podium-empty" hidden></p>
+          </article>
+        </section>
+
+        <section class="charts" aria-label="Charts">
+          <article class="chart-card" id="card-participation">
+            <md-elevation></md-elevation>
+            <header class="chart-card__head">
+              <div class="chart-card__titles">
+                <p class="kicker"><i data-icon="groups"></i>Participation</p>
+                <h2 class="chart-card__title" id="t-participation">Athlete participation over time</h2>
+                <p class="chart-card__insight" data-insight>Athlete entries per Games year, by sex.</p>
+              </div>
+            </header>
+            <div class="chart-card__body">
+              <div class="chart" role="img" aria-labelledby="t-participation" aria-describedby="s-participation"></div>
+              <div class="empty" hidden></div>
+            </div>
+            <p class="chart-card__note" hidden></p>
+            <p class="visually-hidden" id="s-participation" data-summary></p>
+          </article>
+
+          <article class="chart-card" id="card-top">
+            <md-elevation></md-elevation>
+            <header class="chart-card__head">
+              <div class="chart-card__titles">
+                <p class="kicker"><i data-icon="leaderboard"></i>Nations</p>
+                <h2 class="chart-card__title" id="t-top">Top countries</h2>
+                <p class="chart-card__insight" data-insight>Medal rows by nation (NOC).</p>
+              </div>
+              <md-chip-set class="toggle" id="top-mode" aria-label="Top countries metric">
+                <md-filter-chip label="Medals" data-mode="medals" selected></md-filter-chip>
+                <md-filter-chip label="Entries" data-mode="entries"></md-filter-chip>
+              </md-chip-set>
+            </header>
+            <div class="chart-card__body">
+              <div class="chart" role="img" aria-labelledby="t-top" aria-describedby="s-top"></div>
+              <div class="empty" hidden></div>
+            </div>
+            <p class="chart-card__note" data-static-note>Medals counts medal rows (each team member counts). Entries counts athlete-event rows, the metric of the original dashboard.</p>
+            <p class="visually-hidden" id="s-top" data-summary></p>
+          </article>
+
+          <article class="chart-card" id="card-hw">
+            <md-elevation></md-elevation>
+            <header class="chart-card__head">
+              <div class="chart-card__titles">
+                <p class="kicker"><i data-icon="straighten"></i>Body profile</p>
+                <h2 class="chart-card__title" id="t-hw">Height vs weight</h2>
+                <p class="chart-card__insight" data-insight>Where athletes cluster by height and weight.</p>
+              </div>
+            </header>
+            <div class="chart-card__body">
+              <div class="chart" role="img" aria-labelledby="t-hw" aria-describedby="s-hw"></div>
+              <div class="empty" hidden></div>
+            </div>
+            <p class="chart-card__note" hidden></p>
+            <p class="visually-hidden" id="s-hw" data-summary></p>
+          </article>
+
+          <article class="chart-card" id="card-age">
+            <md-elevation></md-elevation>
+            <header class="chart-card__head">
+              <div class="chart-card__titles">
+                <p class="kicker"><i data-icon="military_tech"></i>Winning age</p>
+                <h2 class="chart-card__title" id="t-age">Medal winners by age</h2>
+                <p class="chart-card__insight" data-insight>Age distribution of medalists and non-medalists.</p>
+              </div>
+            </header>
+            <div class="chart-card__body">
+              <div class="chart" role="img" aria-labelledby="t-age" aria-describedby="s-age"></div>
+              <div class="empty" hidden></div>
+            </div>
+            <p class="chart-card__note" data-static-note>Boxes show the middle 50% of ages; whiskers reach the furthest age within 1.5× the box height.</p>
+            <p class="visually-hidden" id="s-age" data-summary></p>
+          </article>
+
+          <article class="chart-card chart-card--wide" id="card-evolution">
+            <md-elevation></md-elevation>
+            <header class="chart-card__head">
+              <div class="chart-card__titles">
+                <p class="kicker"><i data-icon="timeline"></i>Evolution</p>
+                <h2 class="chart-card__title" id="t-evolution">Evolution of the Games</h2>
+                <p class="chart-card__insight" data-insight>Average height, age and weight per Games year, by sex.</p>
+              </div>
+            </header>
+            <div class="chart-card__body">
+              <div class="chart" role="img" aria-labelledby="t-evolution" aria-describedby="s-evolution"></div>
+              <div class="empty" hidden></div>
+            </div>
+            <p class="chart-card__note" hidden></p>
+            <p class="visually-hidden" id="s-evolution" data-summary></p>
+          </article>
+
+          <article class="chart-card chart-card--wide" id="card-sport">
+            <md-elevation></md-elevation>
+            <header class="chart-card__head">
+              <div class="chart-card__titles">
+                <p class="kicker"><i data-icon="sprint"></i>Sports</p>
+                <h2 class="chart-card__title" id="t-sport">Age by sport</h2>
+                <p class="chart-card__insight" data-insight>Mean age by sex in the ten largest sports.</p>
+              </div>
+            </header>
+            <div class="chart-card__body">
+              <div class="chart" role="img" aria-labelledby="t-sport" aria-describedby="s-sport"></div>
+              <div class="empty" hidden></div>
+            </div>
+            <p class="chart-card__note" data-static-note>Top 10 sports by entries with a recorded age in this selection (the original dashboard's rule). Sports added since 2016 that fall outside the top 10 are appended, marked “new”.</p>
+            <p class="visually-hidden" id="s-sport" data-summary></p>
+          </article>
+        </section>
+      </section>
+
+      <!-- ============================== ABOUT ============================== -->
+      <section id="panel-about" class="panel about" role="tabpanel" aria-labelledby="tab-about" hidden>
+        <article class="about-hero">
+          <md-elevation></md-elevation>
+          <p class="kicker"><i data-icon="info"></i>About this dashboard</p>
+          <h2 class="about-hero__title">130 years of Olympians, in one atlas</h2>
+          <p class="lead">
+            This interactive dashboard explores how Olympic athletes have changed over 130 years: who participates,
+            how their body profiles differ across sports, and how these patterns relate to medal outcomes. It now
+            covers every Games from <strong>Athens 1896</strong> to <strong>Milano-Cortina 2026</strong>:
+            56 Summer and Winter Games and 315,094 athlete-event rows.
+          </p>
+          <ul class="facts" aria-label="Coverage at a glance">
+            <li><span class="facts__num">56</span><span>Games</span></li>
+            <li><span class="facts__num">315,094</span><span>athlete-event rows</span></li>
+            <li><span class="facts__num">157,377</span><span>athletes</span></li>
+            <li><span class="facts__num">1896–2026</span><span>coverage</span></li>
+          </ul>
+        </article>
+
+        <div class="about-grid">
+          <article class="about-card">
+            <md-elevation></md-elevation>
+            <h3><i data-icon="database"></i>Data</h3>
+            <p>
+              <strong>Dataset:</strong> <em>athlete_events_through_2026.csv</em> from
+              <a href="https://github.com/ismayc/olympic-moderndive-data" target="_blank" rel="noopener">Olympic History through 2026</a>
+              by Chester Ismay (moderndive), pinned at commit <code>d7f254a</code>. The data ships with this site; nothing is fetched from
+              GitHub, Google or Kaggle while you browse.
+            </p>
+            <p>
+              <strong>1896–2016</strong> rows come from the original sports-reference.com scrape by Randi Griffin
+              (<a href="https://github.com/rgriff23/Olympic_history" target="_blank" rel="noopener">rgriff23/Olympic_history</a>, May 2018), the
+              same data the first version of this dashboard used. <strong>2018–2026</strong> rows (PyeongChang to Milano-Cortina) come from
+              <a href="https://www.olympedia.org" target="_blank" rel="noopener">Olympedia</a> (OlyMADMen).
+            </p>
+            <p>
+              Each row is one athlete competing in one event, with <strong>athlete demographics</strong> (Name, Sex, Age, Height, Weight),
+              <strong>team information</strong> (Team, NOC) and <strong>event details</strong> (Games, Year, Season, City, Sport, Event, Medal).
+            </p>
+          </article>
+
+          <article class="about-card">
+            <md-elevation></md-elevation>
+            <h3><i data-icon="tune"></i>How to use this dashboard</h3>
+            <ul class="icon-list">
+              <li><i data-icon="calendar_month"></i><span>Drag the <strong>Years</strong> slider to focus on an Olympic era, anywhere from 1896 to 2026.</span></li>
+              <li><i data-icon="public"></i><span>Switch <strong>Season</strong> between All, Summer and Winter Games.</span></li>
+              <li><i data-icon="touch_app"></i><span>Hover or tap lines, bars, cells and boxes to see exact values and compare men and women.</span></li>
+              <li><i data-icon="leaderboard"></i><span>Toggle <strong>Top countries</strong> between Medals and Entries.</span></li>
+              <li><i data-icon="flag"></i><span>Use the annotations and notes to spot outliers, structural breaks and gaps in the data.</span></li>
+            </ul>
+          </article>
+
+          <article class="about-card about-card--wide">
+            <md-elevation></md-elevation>
+            <h3><i data-icon="lightbulb"></i>What you can learn here</h3>
+            <ul class="insights">
+              <li><strong>1980 is a turning point.</strong> The US-led boycott of the Moscow Summer Games cut that year's field, and women's participation shows a visible inflection around 1980 before climbing toward parity.</li>
+              <li><strong>Medals vs. turnout.</strong> Which NOCs dominate the medal table, and which contribute most entries overall.</li>
+              <li><strong>Age by sport.</strong> Combat and precision sports skew older; artistic sports such as gymnastics skew younger.</li>
+              <li><strong>The winning age.</strong> Medalists cluster in a narrower age band than non-medalists.</li>
+              <li><strong>Body types.</strong> The height–weight heatmap shows distinct clusters, for example tall, heavy swimmers vs. smaller gymnasts.</li>
+              <li><strong>Drift over time.</strong> Average height and weight drift upward across the 20th century.</li>
+              <li><strong>Summer vs. Winter.</strong> Filter by season to see differences in age, body metrics and participation volume.</li>
+            </ul>
+          </article>
+
+          <article class="about-card about-card--wide">
+            <md-elevation></md-elevation>
+            <h3><i data-icon="table_chart"></i>Columns</h3>
+            <dl class="columns">
+              <div><dt>ID</dt><dd>Unique athlete identifier (used to count unique athletes)</dd></div>
+              <div><dt>Name</dt><dd>Athlete's name</dd></div>
+              <div><dt>Sex</dt><dd>M or F, shown as Male / Female</dd></div>
+              <div><dt>Age</dt><dd>Age in years at the Games</dd></div>
+              <div><dt>Height</dt><dd>Height in centimetres</dd></div>
+              <div><dt>Weight</dt><dd>Weight in kilograms</dd></div>
+              <div><dt>Team</dt><dd>Team name as entered (can be a club or crew, e.g. "Germany-1")</dd></div>
+              <div><dt>NOC</dt><dd>National Olympic Committee, 3-letter code</dd></div>
+              <div><dt>Games</dt><dd>Year and season, e.g. "2026 Winter"</dd></div>
+              <div><dt>Year</dt><dd>Year of the Games</dd></div>
+              <div><dt>Season</dt><dd>Summer or Winter</dd></div>
+              <div><dt>City</dt><dd>Host city</dd></div>
+              <div><dt>Sport</dt><dd>Sport, using Olympedia's grouping</dd></div>
+              <div><dt>Event</dt><dd>Specific event, e.g. "Athletics Men's 1,500 metres"</dd></div>
+              <div><dt>Medal</dt><dd>Gold, Silver, Bronze, or blank for no medal</dd></div>
+            </dl>
+          </article>
+
+          <article class="about-card about-card--wide about-card--caveats">
+            <md-elevation></md-elevation>
+            <h3><i data-icon="warning"></i>Known caveats</h3>
+            <ul class="insights">
+              <li><strong>Sport grouping.</strong> The dataset follows Olympedia: Trampolining and Rhythmic Gymnastics are under Gymnastics, and Beach Volleyball is under Volleyball. So for 1980–2016 the Number of Sports reads <strong>48</strong> here vs. <strong>51</strong> in the original dashboard.</li>
+              <li><strong>Sparse body data after 2016.</strong> For 2018–2026 only about 52% of rows have a height and about 45% a weight. Averages and the heatmap use the rows that have values, and the charts say how much is missing.</li>
+              <li><strong>Team vs. NOC.</strong> "Team" can be a crew or club name, so nations are grouped by NOC code; the display name is the NOC's most common Team value in the data.</li>
+              <li><strong>Medals are medal rows.</strong> Every member of a medal-winning team counts, so team sports weigh more than in official medal tables.</li>
+              <li><strong>Top countries, Entries mode</strong> counts all athlete-event rows per NOC. This is exactly the metric of the original dashboard's "top countries" chart.</li>
+              <li><strong>Averages</strong> are means over the rows in the selection with a recorded value (rows, not unique athletes), as in the original dashboard.</li>
+            </ul>
+          </article>
+
+          <article class="about-card about-card--wide credits" id="credits">
+            <md-elevation></md-elevation>
+            <h3><i data-icon="license"></i>Credits</h3>
+            <h4>Dataset</h4>
+            <p>
+              <a href="https://github.com/ismayc/olympic-moderndive-data" target="_blank" rel="noopener">"Olympic History through 2026"</a>
+              by Chester Ismay, github.com/ismayc/olympic-moderndive-data (pinned commit <code>d7f254a</code>), built on
+              <a href="https://www.olympedia.org" target="_blank" rel="noopener">Olympedia</a> (OlyMADMen, olympedia.org) and Griffin (2018),
+              <a href="https://github.com/rgriff23/Olympic_history" target="_blank" rel="noopener">github.com/rgriff23/Olympic_history</a>.
+              License: <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, as stated in the
+              repository README for the packaged <code>olympicAthletes</code> data. This site aggregates the data (counts, sums and means); no rows were altered.
+            </p>
+            <h4>Citations</h4>
+            <ul class="citations">
+              <li>Griffin, R. (2018). <em>Olympic history dataset</em>. <a href="https://github.com/rgriff23/Olympic_history" target="_blank" rel="noopener">https://github.com/rgriff23/Olympic_history</a></li>
+              <li>OlyMADMen. <em>Olympedia</em>. <a href="https://www.olympedia.org" target="_blank" rel="noopener">https://www.olympedia.org</a></li>
+              <li>Ismay, C. (2026). <em>olympicAthletes</em> (R package, moderndive). <a href="https://github.com/ismayc/olympic-moderndive-data" target="_blank" rel="noopener">https://github.com/ismayc/olympic-moderndive-data</a></li>
+            </ul>
+            <h4>Images</h4>
+            <ul class="citations">
+              <li>
+                <a href="https://commons.wikimedia.org/wiki/File:Olympic_rings_without_rims.svg" target="_blank" rel="noopener">"Olympic rings without rims.svg"</a>,
+                Wikimedia Commons. Public domain (design by Pierre de Coubertin). The Olympic rings are a trademark of the International Olympic Committee;
+                shown unaltered as the header logo, as in the original app.
+              </li>
+              <li>
+                <a href="https://commons.wikimedia.org/wiki/File:Panathinaiko_Stadium_panorama.jpg" target="_blank" rel="noopener">"Panathinaiko Stadium panorama.jpg"</a>
+                by Craig Patik (en.wikipedia User:Patik), 2007. Public domain. Resized, cropped for mobile and converted to WebP.
+              </li>
+            </ul>
+            <h4>Built with</h4>
+            <p>Vite, TypeScript, <a href="https://github.com/material-components/material-web" target="_blank" rel="noopener">Material Web</a> (Material Design 3), <a href="https://echarts.apache.org" target="_blank" rel="noopener">Apache ECharts</a>, Oswald and Roboto Flex (SIL Open Font License), and Material Symbols (Apache 2.0). All self-hosted.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="ring-stripe" aria-hidden="true"></div>
+      <div class="footer__inner">
+        <p><strong>Atlas of Olympians</strong> · Olympics Dashboard 1896–2026</p>
+        <p>Data: “Olympic History through 2026” by Chester Ismay (CC BY 4.0), built on Olympedia and Griffin (2018). <a href="#credits" id="footer-credits">Credits</a></p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

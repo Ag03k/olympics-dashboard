@@ -1,0 +1,140 @@
+/*
+ * Atlas of Olympians — design tokens.
+ * Mirrored in src/theme.ts (used by ECharts). Keep both in sync.
+ *
+ * Olympic palette (--oly-*): medal colours + the five ring colours.
+ *   Fill colours (bright) are for marks/accents only; "-ink" variants are
+ *   text-safe (WCAG AA ≥ 4.5:1 on surface/white).
+ * M3 roles (--md-sys-*): gold-seeded light scheme.
+ */
+:root {
+  /* ---------- Olympic medal palette ---------- */
+  --oly-gold: #d4af37;            /* fill / accent */
+  --oly-gold-bright: #ffd34d;     /* highlights on dark */
+  --oly-gold-ink: #7a5a00;        /* text on light, 6.3:1 on #fff */
+  --oly-gold-container: #fff0c2;
+  --oly-silver: #a9b1b9;          /* fill / accent */
+  --oly-silver-bright: #dde3e8;
+  --oly-silver-ink: #4f5a64;      /* text on light, 7.0:1 */
+  --oly-silver-container: #eef1f4;
+  --oly-bronze: #c87533;          /* fill / accent */
+  --oly-bronze-bright: #e9a46a;
+  --oly-bronze-ink: #8a4510;      /* text on light, 6.6:1 */
+  --oly-bronze-container: #fbe6d4;
+  --oly-on-medal: #1d1600;        /* text on any medal fill */
+
+  /* ---------- Olympic ring colours (accents only) ---------- */
+  --oly-ring-blue: #0081c8;
+  --oly-ring-yellow: #fcb131;
+  --oly-ring-black: #000000;
+  --oly-ring-green: #00a651;
+  --oly-ring-red: #ee334e;
+  --oly-ring-blue-ink: #00639a;
+  --oly-ring-red-ink: #b8122f;
+  --oly-ring-green-ink: #00733a;
+
+  /* ---------- Series colours ---------- */
+  --oly-male: var(--oly-ring-blue);
+  --oly-female: var(--oly-ring-red);
+  --oly-male-ink: var(--oly-ring-blue-ink);
+  --oly-female-ink: var(--oly-ring-red-ink);
+
+  /* ---------- Hero / stadium ---------- */
+  --oly-night: #0b0d17;
+  --oly-night-2: #141827;
+  --oly-ring-stripe: linear-gradient(90deg,
+    var(--oly-ring-blue) 0 20%, var(--oly-ring-yellow) 20% 40%,
+    var(--oly-ring-black) 40% 60%, var(--oly-ring-green) 60% 80%,
+    var(--oly-ring-red) 80% 100%);
+
+  /* ---------- M3 colour roles (light, gold seed) ---------- */
+  --md-sys-color-primary: #7a5a00;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #ffdf9b;
+  --md-sys-color-on-primary-container: #261a00;
+  --md-sys-color-secondary: #6a5d3f;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #f4e1bb;
+  --md-sys-color-on-secondary-container: #241a04;
+  --md-sys-color-tertiary: #00639a;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #cee5ff;
+  --md-sys-color-on-tertiary-container: #001d32;
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #410002;
+  --md-sys-color-background: #fff8f1;
+  --md-sys-color-on-background: #1f1b13;
+  --md-sys-color-surface: #fff8f1;
+  --md-sys-color-surface-dim: #e2d9cc;
+  --md-sys-color-surface-bright: #fff8f1;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #fcf2e5;
+  --md-sys-color-surface-container: #f6ecdf;
+  --md-sys-color-surface-container-high: #f0e7d9;
+  --md-sys-color-surface-container-highest: #ebe1d4;
+  --md-sys-color-surface-variant: #ede1cf;
+  --md-sys-color-on-surface: #1f1b13;
+  --md-sys-color-on-surface-variant: #4d4639;
+  --md-sys-color-outline: #7f7667;
+  --md-sys-color-outline-variant: #d0c5b4;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-inverse-surface: #353027;
+  --md-sys-color-inverse-on-surface: #f9efe2;
+  --md-sys-color-inverse-primary: #f2bf48;
+
+  /* ---------- Typography ---------- */
+  --oly-font-display: "Oswald Variable", "Oswald", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --oly-font-text: "Roboto Flex Variable", "Roboto Flex", Roboto, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --md-ref-typeface-brand: var(--oly-font-display);
+  --md-ref-typeface-plain: var(--oly-font-text);
+  --md-sys-typescale-display-large-font: var(--oly-font-display);
+  --md-sys-typescale-headline-small-font: var(--oly-font-display);
+  --md-sys-typescale-title-large-font: var(--oly-font-display);
+  --md-sys-typescale-label-large-font: var(--oly-font-text);
+  --md-sys-typescale-body-medium-font: var(--oly-font-text);
+
+  /* ---------- Shape ---------- */
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* ---------- Elevation (M3 levels) ---------- */
+  --oly-elev-1: 0 1px 2px rgb(0 0 0 / 0.18), 0 1px 3px 1px rgb(60 40 0 / 0.08);
+  --oly-elev-2: 0 1px 2px rgb(0 0 0 / 0.18), 0 2px 6px 2px rgb(60 40 0 / 0.10);
+  --oly-elev-3: 0 4px 8px 3px rgb(60 40 0 / 0.12), 0 1px 3px rgb(0 0 0 / 0.18);
+
+  /* ---------- Motion (M3) ---------- */
+  --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --md-sys-motion-duration-short2: 100ms;
+  --md-sys-motion-duration-short4: 200ms;
+  --md-sys-motion-duration-medium2: 300ms;
+  --md-sys-motion-duration-medium4: 400ms;
+  --md-sys-motion-duration-long2: 500ms;
+  --md-sys-motion-duration-long4: 600ms;
+  --md-sys-motion-duration-extra-long2: 900ms;
+
+  /* ---------- Layout ---------- */
+  --oly-content-max: 1320px;
+  --oly-gutter: clamp(16px, 3vw, 32px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --md-sys-motion-duration-short2: 0ms;
+    --md-sys-motion-duration-short4: 0ms;
+    --md-sys-motion-duration-medium2: 120ms;
+    --md-sys-motion-duration-medium4: 120ms;
+    --md-sys-motion-duration-long2: 0ms;
+    --md-sys-motion-duration-long4: 0ms;
+    --md-sys-motion-duration-extra-long2: 0ms;
+  }
+}
