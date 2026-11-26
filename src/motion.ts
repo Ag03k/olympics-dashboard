@@ -60,6 +60,21 @@ function animate(el: HTMLElement, from: number, to: number, format: (v: number |
   running.set(el, requestAnimationFrame(step));
 }
 
+/**
+ * Replay the count-up for `el` from 0 to its current target (`data-value`), e.g. when the hero is revealed
+ * after the first count-up already ran invisibly. A later countUp() on the same element cancels it.
+ */
+export function replayCountUp(el: HTMLElement, format: (v: number | null) => string, duration = 1100): void {
+  const v = el.dataset.value;
+  if (!v || reducedMotion()) return;
+  const to = Number(v);
+  if (!Number.isFinite(to)) return;
+  const prevRaf = running.get(el);
+  if (prevRaf) cancelAnimationFrame(prevRaf);
+  el.textContent = format(0);
+  animate(el, 0, to, format, duration);
+}
+
 export function debounce<A extends unknown[]>(fn: (...args: A) => void, ms: number): (...args: A) => void {
   let t: number | undefined;
   return (...args: A) => {

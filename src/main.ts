@@ -1,7 +1,6 @@
-import '@fontsource-variable/oswald/wght.css';
-import '@fontsource-variable/roboto-flex/wght.css';
 import './styles/tokens.css';
 import './styles/app.css';
+import './styles/hero.css';
 
 import '@material/web/tabs/tabs.js';
 import '@material/web/tabs/primary-tab.js';
@@ -26,8 +25,14 @@ import {
 import type { ChartCtx, ChartResult, TopMode } from './charts';
 import { fmtInt, fmtFixed, escapeHtml, EMPTY } from './format';
 import { countUp, debounce, reducedMotion, onReducedMotionChange } from './motion';
+import { startHero } from './intro/boot';
 
 hydrateIcons();
+
+// Start the core data download immediately; the opening intro (lazy-loaded) reads the Games list from it
+// while the dashboard boots in parallel.
+const corePromise = loadJson<CoreData>('/data/core.json');
+startHero(corePromise.then((c) => c.games));
 
 /* ------------------------------------------------------------------ */
 /* State                                                               */
@@ -361,7 +366,7 @@ async function boot(): Promise<void> {
       console.warn('Height/weight data unavailable', err);
     });
   try {
-    state.core = await loadJson<CoreData>('/data/core.json');
+    state.core = await corePromise;
   } catch (err) {
     console.warn(err);
     $('hero-scope').textContent = 'Could not load the data. Please reload the page.';

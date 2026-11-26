@@ -1,0 +1,66 @@
+/* Opening fly-in overlay (lazy-loaded with src/intro/intro.ts). */
+.intro {
+  --iris: 0px;
+  position: fixed; inset: 0; z-index: 9999;
+  background: radial-gradient(120% 90% at 50% 40%, #0a1028 0%, #03050d 70%);
+  overflow: hidden;
+  contain: strict;
+  color: #f3f1ea;
+  user-select: none;
+}
+.intro.is-iris {
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent var(--iris), #000 calc(var(--iris) + 1.5px));
+  mask-image: radial-gradient(circle at 50% 50%, transparent var(--iris), #000 calc(var(--iris) + 1.5px));
+}
+.intro__sky { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.intro__stadium {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  opacity: 0;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+.intro__stadium svg { width: 100%; height: 100%; display: block; }
+.intro__year {
+  position: absolute; left: 50%; bottom: clamp(36px, 9vh, 84px);
+  transform: translateX(-50%);
+  display: flex; align-items: baseline; gap: 14px;
+  margin: 0;
+  font-family: var(--oly-font-digits);
+  font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: rgb(232 236 248 / 0.72);
+}
+.intro__year b {
+  font-weight: 500; font-size: 15px; letter-spacing: 0.2em;
+  color: #f3dc9c;
+  font-variant-numeric: tabular-nums;
+}
+.intro__label {
+  position: absolute; left: 0; top: 0;
+  margin: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px 7px 10px;
+  background: rgb(6 9 22 / 0.72);
+  border: 1px solid rgb(243 220 156 / 0.35);
+  font-family: var(--oly-font-digits);
+  font-size: 12px; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.intro__label i { width: 18px; height: 4px; background: var(--oly-ring-stripe); }
+.intro__skip {
+  position: absolute; right: clamp(16px, 3vw, 36px); bottom: clamp(16px, 4vh, 36px);
+  appearance: none;
+  border: 1px solid rgb(232 236 248 / 0.4);
+  background: rgb(6 9 22 / 0.55);
+  color: #f3f1ea;
+  font: 600 12px/1 var(--oly-font-text);
+  letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 12px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.intro__skip:hover { background: rgb(255 255 255 / 0.12); border-color: rgb(232 236 248 / 0.8); }
+.intro__skip:focus-visible { outline: 2px solid #f3dc9c; outline-offset: 3px; }

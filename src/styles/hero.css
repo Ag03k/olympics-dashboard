@@ -1,0 +1,212 @@
+/* ============================== HERO — "Podium Light" ==============================
+ * Warm paper, broadcast-style diagonal ring-colour bands, rings + stacked wide wordmark,
+ * stat tiles with ring-colour top borders. Reveal choreography lives in src/intro/reveal.ts.
+ */
+:root {
+  --hero-paper: #fbf8f2;
+  --hero-paper-2: #f3eee3;
+  --hero-card: #fffdf9;
+  --hero-ink: #121417;
+  --hero-ink-2: #3a3e45;   /* 10.6:1 on paper */
+  --hero-ink-3: #575c65;   /* 6.5:1 on paper / card */
+  --hero-blue-ink: #00639c; /* 6.3:1 on paper */
+  --hero-rule: rgb(18 20 23 / 0.12);
+  --hero-pad: clamp(20px, 5vw, 80px);
+}
+
+.hero {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 680px;
+  max-height: 900px;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--hero-ink);
+  background:
+    radial-gradient(55% 60% at 18% 12%, #fffefa, transparent 70%),
+    linear-gradient(180deg, var(--hero-paper), var(--hero-paper-2));
+  border-bottom: 1px solid var(--hero-rule);
+}
+
+/* Subtle paper grain (SVG turbulence, multiply) */
+.hero__grain {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Diagonal ring-colour bands ---------- */
+.hero__art {
+  position: absolute; inset: 0; z-index: 1;
+  pointer-events: none;
+}
+/* Rotated about its left-middle point, so at the hero's vertical centre the first band starts at `left`. */
+.hero__bands {
+  position: absolute;
+  top: 50%;
+  left: 69%;
+  height: 280%;
+  display: flex;
+  gap: clamp(10px, 1.1vw, 18px);
+  transform: translateY(-50%) rotate(28deg);
+  transform-origin: 0 50%;
+}
+.hero__band {
+  display: block;
+  flex: 0 0 clamp(46px, 5.6vw, 92px);
+  height: 100%;
+  background: var(--c);
+  box-shadow: 0 30px 60px -30px rgb(18 20 23 / 0.35);
+  will-change: transform;
+}
+.hero__band--thin { flex-basis: clamp(16px, 1.8vw, 28px); }
+
+/* ---------- Copy column ---------- */
+.hero__inner {
+  position: relative; z-index: 2;
+  height: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 96px) var(--hero-pad) clamp(40px, 7vh, 72px);
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+.hero__eyebrow {
+  display: flex; align-items: center; gap: 12px;
+  font: 600 13px/1.2 var(--oly-font-text);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--hero-ink-2);
+  font-variant-numeric: lining-nums;
+}
+.hero__eyebrow::before {
+  content: ""; flex: none; width: 40px; height: 6px;
+  background: var(--oly-ring-stripe);
+}
+.hero__arrow { color: var(--oly-ring-red-ink); letter-spacing: 0; }
+
+.hero__lockup {
+  display: flex; align-items: center;
+  gap: clamp(18px, 2.4vw, 40px);
+  margin-top: clamp(20px, 3.6vh, 36px);
+}
+.hero__rings {
+  flex: none;
+  width: clamp(110px, 11.5vw, 190px);
+  height: auto;
+  transform-origin: 50% 50%;
+}
+.hero__title {
+  display: flex; flex-direction: column;
+  gap: 0.06em;
+  font-family: var(--oly-font-display);
+  font-weight: 880;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  line-height: 1;
+  font-kerning: normal;
+  font-feature-settings: "kern", "lnum";
+  margin: 0;
+  min-width: 0;
+}
+.hero__title-a, .hero__title-b { display: block; line-height: 1; }
+.hero__title-a {
+  font-size: clamp(20px, 2.2vw, 34px);
+  font-weight: 720;
+  letter-spacing: 0.06em;
+  color: var(--hero-blue-ink);
+}
+.hero__title-b {
+  position: relative;
+  font-size: clamp(72px, 7vw, 132px);
+  letter-spacing: -0.025em;
+  color: var(--hero-ink);
+  padding-bottom: 0.16em;
+}
+/* Mask: the line rises through it. Padding gives the caps room so nothing is clipped at rest. */
+.hero__mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.08em 0.06em 0.04em;
+  margin: -0.08em -0.06em -0.04em;
+}
+.hero__line { display: block; white-space: nowrap; }
+/* Letters (split by JS): same font-size, inline-block, baseline aligned → one shared baseline. */
+.hero__ch { display: inline-block; vertical-align: baseline; }
+.hero__underline {
+  position: absolute; left: 0.03em; bottom: 0;
+  width: 1.6em; height: 0.085em;
+  background: var(--oly-ring-red);
+  transform-origin: 0 50%;
+}
+
+.hero__sub {
+  margin-top: clamp(18px, 3vh, 30px);
+  max-width: 34em;
+  font: 450 clamp(16px, 1.3vw, 19px)/1.5 var(--oly-font-text);
+  color: var(--hero-ink-2);
+  text-wrap: pretty;
+}
+
+/* ---------- Stat tiles ---------- */
+.hero__strip { margin-top: clamp(26px, 5vh, 52px); display: grid; gap: 12px; max-width: 800px; }
+.hero__stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(8px, 1vw, 14px);
+}
+.hero-stat {
+  background: var(--hero-card);
+  border-top: 6px solid var(--c);
+  padding: 14px 16px 14px;
+  box-shadow: 0 1px 0 var(--hero-rule), 0 0 0 1px rgb(18 20 23 / 0.05), 0 14px 30px -24px rgb(18 20 23 / 0.45);
+  min-width: 0;
+}
+.hero-stat dt {
+  font: 700 11.5px/1.2 var(--oly-font-text);
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--hero-ink-3);
+}
+.hero-stat dd {
+  margin: 10px 0 0;
+  font-family: var(--oly-font-digits);
+  font-weight: 560;
+  font-size: clamp(18px, 1.9vw, 28px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--hero-ink);
+  white-space: nowrap;
+}
+.hero__scope {
+  font: 500 13px/1.4 var(--oly-font-text);
+  color: var(--hero-ink-3);
+}
+
+/* ---------- Pre-reveal gate (set by inline script in index.html) ---------- */
+html.hero-pending .hero__inner,
+html.hero-pending .hero__bands { visibility: hidden; }
+/* Black cover until the intro overlay mounts (prevents a flash of the paper hero). */
+html[data-intro="intro"].intro-cover body::after {
+  content: ""; position: fixed; inset: 0; z-index: 9998; background: #03050d;
+}
+html.intro-lock, html.intro-lock body { overflow: hidden; }
+
+/* ---------- Responsive (keep it unbroken, not tuned) ---------- */
+@media (max-width: 900px) {
+  .hero { height: auto; min-height: 0; max-height: none; }
+  .hero__art { position: relative; inset: auto; width: 100%; height: 150px; overflow: hidden; }
+  .hero__bands { left: 30%; height: 600%; }
+  .hero__inner { height: auto; padding-top: 28px; padding-bottom: 32px; }
+}
+@media (max-width: 560px) {
+  .hero__eyebrow { font-size: 11px; letter-spacing: 0.12em; gap: 8px; }
+  .hero__eyebrow::before { width: 24px; }
+  .hero__lockup { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .hero__rings { width: 110px; }
+  .hero__title-b { font-size: clamp(34px, 10.4vw, 56px); }
+  .hero__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero-stat dd { font-size: 20px; }
+}

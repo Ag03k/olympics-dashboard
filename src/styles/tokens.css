@@ -7,6 +7,29 @@
  *   text-safe (WCAG AA ≥ 4.5:1 on surface/white).
  * M3 roles (--md-sys-*): gold-seeded light scheme.
  */
+/* ---------- Self-hosted variable fonts (SIL OFL 1.1, see public/fonts/OFL-*.txt) ---------- */
+@font-face {
+  font-family: "Hubot Sans";
+  src: url('/fonts/HubotSans-VF.woff2') format('woff2-variations'), url('/fonts/HubotSans-VF.woff2') format('woff2');
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+  font-style: oblique 0deg 10deg;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Mona Sans";
+  src: url('/fonts/MonaSans-VF.woff2') format('woff2-variations'), url('/fonts/MonaSans-VF.woff2') format('woff2');
+  font-weight: 200 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Martian Mono";
+  src: url('/fonts/MartianMono-VF.woff2') format('woff2-variations'), url('/fonts/MartianMono-VF.woff2') format('woff2');
+  font-weight: 100 800;
+  font-stretch: 75% 112.5%;
+  font-display: swap;
+}
+
 :root {
   /* ---------- Olympic medal palette ---------- */
   --oly-gold: #d4af37;            /* fill / accent */
@@ -86,8 +109,9 @@
   --md-sys-color-inverse-primary: #f2bf48;
 
   /* ---------- Typography ---------- */
-  --oly-font-display: "Oswald Variable", "Oswald", "Arial Narrow", "Roboto Condensed", sans-serif;
-  --oly-font-text: "Roboto Flex Variable", "Roboto Flex", Roboto, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --oly-font-display: "Hubot Sans", "Mona Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --oly-font-text: "Mona Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --oly-font-digits: "Martian Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --md-ref-typeface-brand: var(--oly-font-display);
   --md-ref-typeface-plain: var(--oly-font-text);
   --md-sys-typescale-display-large-font: var(--oly-font-display);

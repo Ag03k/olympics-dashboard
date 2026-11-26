@@ -5,79 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Atlas of Olympians · Olympics Dashboard 1896–2026</title>
     <meta name="description" content="Explore 130 years of Olympic history, from Athens 1896 to Milano-Cortina 2026: participation, medals by nation, athlete height, weight and age, and how the Games have evolved." />
-    <meta name="theme-color" content="#0b0d17" />
+    <meta name="theme-color" content="#fbf8f2" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/HubotSans-VF.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/MartianMono-VF.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="preload" href="/data/core.json" as="fetch" type="application/json" crossorigin="anonymous" />
     <meta property="og:title" content="Atlas of Olympians · Olympics Dashboard 1896–2026" />
     <meta property="og:description" content="130 years of Olympic history · Athens 1896 → Milano-Cortina 2026" />
     <meta property="og:type" content="website" />
+    <script>
+      (function () {
+        var q = new URLSearchParams(location.search);
+        var d = document.documentElement;
+        var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var mode = q.has('static') ? 'static' : reduced ? 'reduced' : q.has('nointro') ? 'nointro' : 'intro';
+        d.dataset.intro = mode;
+        if (mode !== 'static') d.classList.add('hero-pending');
+        if (mode === 'intro') d.classList.add('intro-cover', 'intro-lock');
+      })();
+    </script>
+    <noscript><style>html.hero-pending .hero__inner, html.hero-pending .hero__bands { visibility: visible !important; opacity: 1 !important; }</style></noscript>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="hero" id="top">
-      <picture class="hero__media">
-        <source
-          media="(max-width: 700px)"
-          type="image/webp"
-          srcset="/img/stadium-portrait-800.webp 800w, /img/stadium-portrait-1400.webp 1400w"
-          sizes="82vh"
-        />
-        <source
-          type="image/webp"
-          srcset="/img/stadium-1600.webp 1600w, /img/stadium-2400.webp 2400w, /img/stadium-3200.webp 3200w"
-          sizes="(min-aspect-ratio: 4/1) 100vw, 330vh"
-        />
-        <img
-          src="/img/stadium-1600.webp"
-          width="1600"
-          height="330"
-          alt="Panoramic view of the Panathenaic Stadium in Athens, the marble stadium that hosted the first modern Olympic Games in 1896"
-          fetchpriority="high"
-          decoding="async"
-        />
-      </picture>
-      <div class="hero__scrim" aria-hidden="true"></div>
-      <div class="hero__lights" aria-hidden="true"></div>
+      <div class="hero__grain" aria-hidden="true"></div>
+      <div class="hero__art" aria-hidden="true">
+        <div class="hero__bands">
+          <i class="hero__band" style="--c: var(--oly-ring-blue)"></i>
+          <i class="hero__band" style="--c: var(--oly-ring-yellow)"></i>
+          <i class="hero__band hero__band--thin" style="--c: var(--hero-ink)"></i>
+          <i class="hero__band" style="--c: var(--oly-ring-green)"></i>
+          <i class="hero__band" style="--c: var(--oly-ring-red)"></i>
+        </div>
+      </div>
 
       <div class="hero__inner">
-        <div class="hero__top">
-          <span class="logo-pill">
-            <img src="/img/olympic-rings.svg" alt="Olympic rings" width="342" height="158" />
-          </span>
-          <span class="hero__badge"><i data-icon="stadium"></i>Olympics Dashboard</span>
+        <p class="hero__eyebrow" data-reveal><span>Athens 1896</span> <span class="hero__arrow" aria-hidden="true">→</span><span class="visually-hidden"> to </span> <span>Milano&#8209;Cortina 2026</span></p>
+        <div class="hero__lockup">
+          <img class="hero__rings" src="/img/olympic-rings.svg" alt="Olympic rings" width="342" height="158" fetchpriority="high" />
+          <h1 class="hero__title" aria-label="Atlas of Olympians">
+            <span class="hero__title-a" aria-hidden="true"><span class="hero__mask"><span class="hero__line">Atlas of</span></span></span>
+            <span class="hero__title-b" aria-hidden="true"><span class="hero__mask"><span class="hero__line">Olympians</span></span><i class="hero__underline"></i></span>
+          </h1>
         </div>
-
-        <div class="hero__copy">
-          <p class="hero__eyebrow"><span>Athens 1896</span> <span aria-hidden="true">·</span> <span>Milano&#8209;Cortina 2026</span></p>
-          <h1 class="hero__title">Atlas of <span>Olympians</span></h1>
-          <p class="hero__sub">130 years of Olympic history · Athens 1896 → Milano&#8209;Cortina&nbsp;2026</p>
-        </div>
+        <p class="hero__sub" data-reveal>130 years of athletes, nations and medals, from the first modern Games to the latest.</p>
 
         <div class="hero__strip">
           <dl class="hero__stats" aria-describedby="hero-scope">
-            <div class="hero-stat">
+            <div class="hero-stat" style="--c: var(--oly-ring-blue)">
               <dt>Games</dt>
               <dd class="num" id="hero-games">—</dd>
             </div>
-            <div class="hero-stat">
+            <div class="hero-stat" style="--c: var(--oly-ring-yellow)">
               <dt>Athletes</dt>
               <dd class="num" id="hero-athletes">—</dd>
             </div>
-            <div class="hero-stat">
+            <div class="hero-stat" style="--c: var(--hero-ink)">
               <dt>Entries</dt>
               <dd class="num" id="hero-entries">—</dd>
             </div>
-            <div class="hero-stat">
+            <div class="hero-stat" style="--c: var(--oly-ring-green)">
               <dt>Medals</dt>
               <dd class="num" id="hero-medals">—</dd>
             </div>
           </dl>
-          <p class="hero__scope" id="hero-scope">Loading the Games…</p>
+          <p class="hero__scope" id="hero-scope" data-reveal>Loading the Games…</p>
         </div>
       </div>
-      <div class="ring-stripe" aria-hidden="true"></div>
     </header>
 
     <nav class="appbar" aria-label="Sections">
@@ -417,12 +414,14 @@
                 shown unaltered as the header logo, as in the original app.
               </li>
               <li>
-                <a href="https://commons.wikimedia.org/wiki/File:Panathinaiko_Stadium_panorama.jpg" target="_blank" rel="noopener">"Panathinaiko Stadium panorama.jpg"</a>
-                by Craig Patik (en.wikipedia User:Patik), 2007. Public domain. Resized, cropped for mobile and converted to WebP.
+                Map: <a href="https://www.naturalearthdata.com" target="_blank" rel="noopener">Natural Earth</a> (public domain) via
+                <a href="https://github.com/topojson/world-atlas" target="_blank" rel="noopener">world-atlas</a> (ISC), used in the opening globe.
               </li>
             </ul>
             <h4>Built with</h4>
-            <p>Vite, TypeScript, <a href="https://github.com/material-components/material-web" target="_blank" rel="noopener">Material Web</a> (Material Design 3), <a href="https://echarts.apache.org" target="_blank" rel="noopener">Apache ECharts</a>, Oswald and Roboto Flex (SIL Open Font License), and Material Symbols (Apache 2.0). All self-hosted.</p>
+            <p>Vite, TypeScript, <a href="https://github.com/material-components/material-web" target="_blank" rel="noopener">Material Web</a> (Material Design 3), <a href="https://echarts.apache.org" target="_blank" rel="noopener">Apache ECharts</a>, <a href="https://gsap.com" target="_blank" rel="noopener">GSAP</a>, d3-geo and topojson-client (ISC), and Material Symbols (Apache 2.0). All self-hosted.</p>
+            <h4>Fonts</h4>
+            <p><a href="https://github.com/github/hubot-sans" target="_blank" rel="noopener">Hubot Sans</a> and <a href="https://github.com/github/mona-sans" target="_blank" rel="noopener">Mona Sans</a> (GitHub, SIL OFL 1.1); <a href="https://github.com/evilmartians/mono" target="_blank" rel="noopener">Martian Mono</a> (Evil Martians, SIL OFL 1.1). Self-hosted.</p>
           </article>
         </div>
       </section>

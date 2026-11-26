@@ -45,8 +45,9 @@ export const tokens = {
   outline: '#7f7667',
   outlineVariant: '#d0c5b4',
   // Typography (--oly-font-*)
-  fontDisplay: '"Oswald Variable", "Oswald", "Arial Narrow", sans-serif',
-  fontText: '"Roboto Flex Variable", "Roboto Flex", Roboto, system-ui, sans-serif',
+  fontDisplay: '"Hubot Sans", "Mona Sans", system-ui, sans-serif',
+  fontText: '"Mona Sans", system-ui, sans-serif',
+  fontDigits: '"Martian Mono", ui-monospace, monospace',
   // Motion (--md-sys-motion-duration-long4)
   durationUpdate: 600,
   durationEnter: 900,

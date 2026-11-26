@@ -16,7 +16,8 @@ This is the **rebuild** branch: a static Vite + TypeScript site that replaces th
 - [Vite](https://vite.dev) + TypeScript (vanilla, no framework)
 - [Material Web](https://github.com/material-components/material-web) (Material Design 3 components) with M3 design tokens as CSS custom properties (`src/styles/tokens.css`)
 - [Apache ECharts](https://echarts.apache.org) (tree-shaken via `echarts/core`) with a custom theme mirrored from the tokens (`src/theme.ts`)
-- Self-hosted fonts (Oswald, Roboto Flex via `@fontsource-variable`) and Material Symbols icons inlined as SVG (`@material-symbols/svg-400`)
+- Self-hosted variable fonts in `public/fonts/` (see [Fonts](#fonts)) and Material Symbols icons inlined as SVG (`@material-symbols/svg-400`)
+- [GSAP](https://gsap.com), [d3-geo](https://github.com/d3/d3-geo), [topojson-client](https://github.com/topojson/topojson-client) and [world-atlas](https://github.com/topojson/world-atlas) for the opening intro (lazy-loaded, see [Opening intro](#opening-intro))
 - No runtime requests to any third-party origin: data, fonts, icons and images are served from the site's own origin.
 
 ## Run locally
@@ -29,6 +30,29 @@ npm run dev       # dev server at http://localhost:5173
 npm run build     # type-check (tsc --noEmit) and build to dist/
 npm run preview   # serve dist/ at http://localhost:4173
 ```
+
+## Opening intro
+
+On load, a ~4.6 s full-screen "camera drop" plays (`src/intro/`): a night globe lights up every host city from 1896 to 2026,
+turns to Milano–Cortina and descends into an aerial of a stadium, whose infield irises open onto the hero, then the hero
+reveals itself. It is lazy-loaded, so the dashboard data loads in parallel.
+
+- **Skip intro** button (bottom-right), or any key, wheel, touch or click: jumps to the hero's final state in ~300 ms.
+- `?nointro=1`: no fly-in; the hero reveal still plays.
+- `?static=1`: no animation at all; final state immediately.
+- `prefers-reduced-motion: reduce`: no fly-in; the hero simply fades in.
+- `window.__introDone` / `window.__heroReady` are set to `true` when the overlay is gone / the hero reveal has finished.
+
+## Fonts
+
+Self-hosted variable WOFF2 files in `public/fonts/`, each with its license text alongside (`OFL-*.txt`). All are under the
+[SIL Open Font License 1.1](https://openfontlicense.org).
+
+| Font | Use | File | Source |
+| --- | --- | --- | --- |
+| Hubot Sans (GitHub) | display: wordmark (width 125), headings | `HubotSans-VF.woff2` | https://github.com/github/hubot-sans |
+| Mona Sans (GitHub) | body text | `MonaSans-VF.woff2` | https://github.com/github/mona-sans |
+| Martian Mono (Evil Martians) | hero and stat-card numbers, intro captions | `MartianMono-VF.woff2` | https://github.com/evilmartians/mono |
 
 ## Rebuild the data
 
@@ -89,9 +113,10 @@ Citations:
 - `public/img/olympic-rings.svg`: "Olympic rings without rims.svg", Wikimedia Commons,
   https://commons.wikimedia.org/wiki/File:Olympic_rings_without_rims.svg. Public domain (design by Pierre de Coubertin).
   The Olympic rings are a trademark of the IOC; shown unaltered as the header logo, as in the original app.
-- `public/img/stadium-*.webp`: "Panathinaiko Stadium panorama.jpg" by Craig Patik (en.wikipedia User:Patik), 2007,
-  public domain, https://commons.wikimedia.org/wiki/File:Panathinaiko_Stadium_panorama.jpg. Resized, center-cropped
-  for mobile, and converted to WebP.
+- Map (opening intro): [Natural Earth](https://www.naturalearthdata.com) 1:110m, public domain, via
+  [world-atlas](https://github.com/topojson/world-atlas) (ISC), bundled locally.
+- `public/img/stadium-*.webp` (Panathinaiko Stadium panorama by Craig Patik, public domain) are no longer shown on the site
+  and remain in the repo only as unused files.
 - `public/favicon.svg`: a simple medal drawn for this project.
 
-Fonts: Oswald and Roboto Flex (SIL Open Font License). Icons: Material Symbols (Apache 2.0).
+Fonts: Hubot Sans, Mona Sans (GitHub) and Martian Mono (Evil Martians), SIL OFL 1.1; see [Fonts](#fonts). Icons: Material Symbols (Apache 2.0).
