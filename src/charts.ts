@@ -54,8 +54,17 @@ function tooltipBase(): Record<string, unknown> {
     confine: true,
     triggerOn: 'mousemove|click',
     enterable: false,
-    transitionDuration: 0.2,
+    transitionDuration: 0.15,
   };
+}
+
+/** Hover state that never fades or darkens anything: no series focus/blur, full opacity kept. */
+const NO_BLUR = { focus: 'none', blurScope: 'coordinateSystem' } as const;
+const BLUR_KEEP = { itemStyle: { opacity: 1 }, lineStyle: { opacity: 1 }, label: { opacity: 1 } } as const;
+
+/** Thin gold outline used as the hover cue on bars / cells / boxes (no shadow, no colour change). */
+function ringEmphasis(width = 1.5): Record<string, unknown> {
+  return { ...NO_BLUR, itemStyle: { borderColor: tokens.gold, borderWidth: width, shadowBlur: 0, shadowColor: 'transparent' } };
 }
 
 function lighten(hex: string, amount: number): string {
@@ -159,7 +168,7 @@ export function participationChart(s: Summary, ctx: ChartCtx): ChartResult {
           row(tokens.male, 'Male', fmtInt(p.male)) +
           row(tokens.female, 'Female', fmtInt(p.female)) +
           row(tokens.silver, 'Total', fmtInt(p.male + p.female)) +
-          (p.year === 1980 ? `<div style="margin-top:6px;color:${tokens.gold}">1980 Moscow Boycott</div>` : '');
+          (p.year === 1980 ? `<div style="margin-top:6px;color:${tokens.goldInk};font-weight:600">1980 Moscow Boycott</div>` : '');
       },
     },
     xAxis: {
@@ -177,7 +186,8 @@ export function participationChart(s: Summary, ctx: ChartCtx): ChartResult {
         id: 'male', name: 'Male', type: 'line', color: tokens.male,
         data: pts.map((p) => [p.year, p.male]),
         symbolSize: ctx.width < 480 ? 5 : 7,
-        emphasis: { focus: 'series', scale: 1.6 },
+        emphasis: { ...NO_BLUR, scale: 1.4 },
+        blur: BLUR_KEEP,
         lineStyle: { width: 3 },
         markLine,
         markPoint,
@@ -186,7 +196,8 @@ export function participationChart(s: Summary, ctx: ChartCtx): ChartResult {
         id: 'female', name: 'Female', type: 'line', color: tokens.female,
         data: pts.map((p) => [p.year, p.female]),
         symbolSize: ctx.width < 480 ? 5 : 7,
-        emphasis: { focus: 'series', scale: 1.6 },
+        emphasis: { ...NO_BLUR, scale: 1.4 },
+        blur: BLUR_KEEP,
         lineStyle: { width: 3 },
         areaStyle: { opacity: 0.06 },
       },
@@ -258,7 +269,7 @@ export function topCountriesChart(s: Summary, mode: TopMode, ctx: ChartCtx): Cha
   const tooltip = {
     ...tooltipBase(),
     trigger: 'axis',
-    axisPointer: { type: 'shadow' },
+    axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(212, 175, 55, 0.07)' } },
     formatter: (params: unknown) => {
       const arr = params as { dataIndex: number }[];
       const r = list[arr[0]?.dataIndex ?? -1];
@@ -280,7 +291,8 @@ export function topCountriesChart(s: Summary, mode: TopMode, ctx: ChartCtx): Cha
         color: MEDAL_COLORS[mi],
         barMaxWidth: 26, barCategoryGap: '28%',
         data: list.map((r, i) => ({ value: r[k], itemStyle: { color: fill(MEDAL_COLORS[mi], i) } })),
-        emphasis: { focus: 'none', itemStyle: { shadowBlur: 6, shadowColor: 'rgba(0,0,0,.2)' } },
+        emphasis: ringEmphasis(),
+        blur: BLUR_KEEP,
         itemStyle: mi === 2 ? { borderRadius: [0, 4, 4, 0] } : undefined,
         label: mi === 2 ? totalLabel((r) => r.total) : { show: false },
       }))
@@ -291,7 +303,8 @@ export function topCountriesChart(s: Summary, mode: TopMode, ctx: ChartCtx): Cha
           value: r.entries,
           itemStyle: { color: i < 3 ? MEDAL_COLORS[i] : '#c9bba3', borderRadius: [0, 4, 4, 0] },
         })),
-        emphasis: { itemStyle: { shadowBlur: 6, shadowColor: 'rgba(0,0,0,.2)' } },
+        emphasis: ringEmphasis(),
+        blur: BLUR_KEEP,
         label: totalLabel((r) => r.entries),
       }];
 
@@ -377,7 +390,8 @@ export function heightWeightChart(s: Summary, bins: HeatBins | null, loading: bo
     series: [{
       id: 'hw', name: 'Athlete entries', type: 'heatmap', data: bins.cells,
       itemStyle: { borderColor: tokens.surfaceContainerLowest, borderWidth: 1, borderRadius: 2 },
-      emphasis: { itemStyle: { borderColor: tokens.onSurface, borderWidth: 1.5 } },
+      emphasis: ringEmphasis(2),
+      blur: BLUR_KEEP,
       progressive: 0,
     }],
   };
@@ -412,7 +426,8 @@ export function medalAgeChart(s: Summary, ctx: ChartCtx): ChartResult {
       borderColor: si === 0 ? tokens.male : tokens.female,
       borderWidth: 2,
     },
-    emphasis: { itemStyle: { borderWidth: 3, shadowBlur: 8, shadowColor: 'rgba(0,0,0,.18)' } },
+    emphasis: { ...NO_BLUR, itemStyle: { borderWidth: 2.5, shadowBlur: 0, shadowColor: 'transparent' } },
+    blur: BLUR_KEEP,
     data: cats.map((_, ci) => {
       const b = s.boxes[ci][si];
       return b ? [b.lower, b.q1, b.median, b.q3, b.upper] : '-';
@@ -516,7 +531,8 @@ export function evolutionChart(s: Summary, ctx: ChartCtx): ChartResult {
       color: si === 0 ? tokens.male : tokens.female,
       symbolSize: ctx.width < 480 ? 4 : 6,
       lineStyle: { width: 2.5 },
-      emphasis: { focus: 'series' },
+      emphasis: { ...NO_BLUR, scale: 1.4 },
+      blur: BLUR_KEEP,
       connectNulls: true,
       data: pts.filter((p) => p[m.key][si] != null).map((p) => [p.year, Number(p[m.key][si]!.toFixed(2))]),
     }))),
@@ -568,7 +584,7 @@ export function sportAgeChart(s: Summary, ctx: ChartCtx): ChartResult {
     tooltip: {
       ...tooltipBase(),
       trigger: 'axis',
-      axisPointer: { type: 'shadow' },
+      axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(212, 175, 55, 0.07)' } },
       formatter: (params: unknown) => {
         const arr = params as { dataIndex: number }[];
         const r = rows[arr[0]?.dataIndex ?? -1];
@@ -585,7 +601,8 @@ export function sportAgeChart(s: Summary, ctx: ChartCtx): ChartResult {
       color: si === 0 ? tokens.male : tokens.female,
       barMaxWidth: 22, barGap: '12%', barCategoryGap: '30%',
       itemStyle: { borderRadius: horizontal ? [0, 3, 3, 0] : [3, 3, 0, 0] },
-      emphasis: { focus: 'series' },
+      emphasis: ringEmphasis(),
+      blur: BLUR_KEEP,
       label: {
         show: true, position: horizontal ? 'right' : 'top', distance: 3,
         formatter: (p: { value: number | string }) => (typeof p.value === 'number' ? p.value.toFixed(1) : ''),

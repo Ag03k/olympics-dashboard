@@ -1,169 +1,82 @@
 /**
- * Aerial "camera drop" opening (~4.6 s):
- *   0–1.6 s   starfield + night globe, host cities light up chronologically 1896 → 2026
- *   1.6–3.4 s globe turns to Milano–Cortina and the camera descends (projection scale ×1 → ×60, expo.inOut)
- *   3.0–4.0 s cross into a hand-built SVG aerial of a stadium, still descending
- *   3.85–4.6 s the infield irises open onto the paper hero; overlay removed; hero reveal plays
+ * "Google Earth" opening (~6 s): a real satellite-imagery globe (WebGL, src/intro/earth.ts) zooms
+ * from the whole planet down to Stadio San Siro, Milan (Milano–Cortina 2026 opening ceremony).
+ *   0–0.6 s   Earth fades in from black, small and slowly turning (centred ~30° N, 40° W)
+ *   0.4–2.2 s turn to San Siro while descending to continent scale (~0.6 R)
+ *   2.0–5.2 s continuous exponential descent straight down to a ~4 km-wide aerial view
+ *   4.0–5.2 s label + lat/lon readout + pin pulse
+ *   5.2–6.0 s iris opens onto the paper hero; hero reveal plays; GL context released
+ * No WebGL, or base imagery not ready within 2.5 s → straight to the hero reveal.
  * Skip: button, wheel, any key, pointer → ~300 ms to the hero's end state.
  */
 import { gsap } from 'gsap';
-import { drawGlobe, drawCity, fitCanvas, geoOrthographic } from './geo';
-import { hostPoints, DESCENT_TARGET, type HostPoint } from './hostCities';
-import { stadiumSvg } from './stadium';
+import { createGlobe, type Camera } from './earth';
 import { revealHero } from './reveal';
 import type { GameLite } from './boot';
 import './intro.css';
 
-const ZOOM = 60;
-const T = {
-  rotate: 1.6,
-  zoomEnd: 3.4,
-  stadium: 3.0,
-  iris: 3.85,
-  reveal: 4.05,
-  end: 4.6,
-};
+const TARGET = { lat: 45.4781, lon: 9.124 }; // Stadio Giuseppe Meazza (San Siro)
+const START = { lat: 30, lon: -46, alt: 4 };
+const MID_ALT = 0.6;
+const END_WIDTH_KM = 4;
+const LOAD_TIMEOUT = 2500;
+const T = { label: 4.0, land: 5.2, reveal: 5.35, end: 6.0 };
 
-interface Star { x: number; y: number; r: number; a: number }
+const fmtLat = (v: number) => `${Math.abs(v).toFixed(4)}° ${v >= 0 ? 'N' : 'S'}`;
+const fmtLon = (v: number) => `${Math.abs(v).toFixed(4)}° ${v >= 0 ? 'E' : 'W'}`;
 
-function makeStars(w: number, h: number, dpr: number): HTMLCanvasElement {
-  const cv = document.createElement('canvas');
-  cv.width = Math.round(w * dpr);
-  cv.height = Math.round(h * dpr);
-  const ctx = cv.getContext('2d')!;
-  ctx.scale(dpr, dpr);
-  const n = Math.round((w * h) / 1500);
-  const stars: Star[] = [];
-  for (let i = 0; i < n; i++) {
-    stars.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() < 0.92 ? 0.35 + Math.random() * 0.45 : 0.8 + Math.random() * 0.6, a: 0.25 + Math.random() * 0.7 });
-  }
-  for (const s of stars) {
-    ctx.fillStyle = `rgba(235, 240, 255, ${s.a.toFixed(2)})`;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  return cv;
-}
-
-export async function playIntro(gamesP: Promise<GameLite[]>): Promise<void> {
+export async function playIntro(_games?: Promise<GameLite[]>): Promise<void> {
   const d = document.documentElement;
   const root = document.createElement('div');
   root.className = 'intro';
   root.setAttribute('role', 'region');
   root.setAttribute('aria-label', 'Opening animation');
   root.innerHTML = `
-    <canvas class="intro__sky" aria-hidden="true"></canvas>
-    <div class="intro__stadium" aria-hidden="true">${stadiumSvg()}</div>
-    <p class="intro__year" aria-hidden="true"><span>Host cities</span><b>1896</b></p>
-    <p class="intro__label" aria-hidden="true"><i></i>Milano–Cortina 2026</p>
+    <canvas class="intro__gl" aria-hidden="true"></canvas>
+    <div class="intro__pin" aria-hidden="true"><i></i><i></i></div>
+    <div class="intro__label" aria-hidden="true">
+      <p class="intro__name"><i></i>Milano–Cortina 2026 · Stadio San Siro</p>
+      <p class="intro__coords">${fmtLat(TARGET.lat)}&nbsp;&nbsp;${fmtLon(TARGET.lon)}</p>
+    </div>
+    <p class="intro__credit">Imagery: NASA Blue Marble · Sentinel-2 cloudless 2016 by EOX (CC BY 4.0)</p>
     <button class="intro__skip" type="button">Skip intro</button>`;
   document.body.appendChild(root);
   d.classList.remove('intro-cover');
 
-  const cv = root.querySelector<HTMLCanvasElement>('.intro__sky')!;
-  const ctx = cv.getContext('2d')!;
-  const stadium = root.querySelector<HTMLElement>('.intro__stadium')!;
-  const yearEl = root.querySelector<HTMLElement>('.intro__year b')!;
-  const yearWrap = root.querySelector<HTMLElement>('.intro__year')!;
+  const canvas = root.querySelector<HTMLCanvasElement>('.intro__gl')!;
+  const pin = root.querySelector<HTMLElement>('.intro__pin')!;
   const label = root.querySelector<HTMLElement>('.intro__label')!;
+  const coords = root.querySelector<HTMLElement>('.intro__coords')!;
+  const credit = root.querySelector<HTMLElement>('.intro__credit')!;
   const skipBtn = root.querySelector<HTMLButtonElement>('.intro__skip')!;
-
-  let size = fitCanvas(cv);
-  let stars = makeStars(size.w, size.h, size.dpr);
-  const onResize = () => {
-    size = fitCanvas(cv);
-    stars = makeStars(size.w, size.h, size.dpr);
-  };
-  window.addEventListener('resize', onResize);
-
-  // Wait for the Games list (already downloading in parallel), but never hold the intro for long.
-  const games = await Promise.race([gamesP, new Promise<GameLite[]>((r) => setTimeout(() => r([]), 1500))]);
-  const points = hostPoints(games).filter((p): p is HostPoint => !!p);
-
-  const proj = geoOrthographic().clipAngle(90).precision(0.6);
-  const st = {
-    lon: -78, lat: 12,       // view centre
-    k: 0.86, globeA: 0, starsA: 0,
-    lit: 0,
-    pinA: 0,
-  };
-
-  const render = () => {
-    const { w, h } = size;
-    ctx.clearRect(0, 0, w, h);
-    const zoom = Math.max(1, st.k);
-    // Stars stream outward slightly with the descent, and fade as the globe fills the frame.
-    const sa = st.starsA * Math.max(0, 1 - Math.log(zoom) / Math.log(6));
-    if (sa > 0.01) {
-      const s = Math.pow(zoom, 0.35);
-      ctx.globalAlpha = sa;
-      ctx.drawImage(stars, (w - w * s) / 2, (h - h * s) / 2, w * s, h * s);
-      ctx.globalAlpha = 1;
-    }
-    if (st.globeA > 0.005) {
-      const r0 = Math.min(w, h) * 0.34;
-      proj.scale(r0 * st.k).translate([w / 2, h / 2]).rotate([-st.lon, -st.lat]).clipExtent([[-40, -40], [w + 40, h + 40]]);
-      ctx.globalAlpha = st.globeA;
-      drawGlobe(ctx, proj, { glow: 1, line: Math.min(2.2, 1 + Math.log(zoom) * 0.3) });
-      const dot = Math.min(3.2, 1.6 * Math.pow(zoom, 0.25));
-      const litN = st.lit;
-      for (let i = 0; i < points.length && i < litN; i++) {
-        const p = points[i];
-        const xy = proj([p.lon, p.lat]);
-        if (!xy || !isFront(p)) continue;
-        if (xy[0] < -20 || xy[1] < -20 || xy[0] > w + 20 || xy[1] > h + 20) continue;
-        const age = litN - i;
-        drawCity(ctx, xy[0], xy[1], p, Math.min(1, age * 1.5), dot, Math.max(0, 1 - age / 4));
-      }
-      if (st.pinA > 0.01) {
-        const xy = proj([DESCENT_TARGET.lon, DESCENT_TARGET.lat]);
-        if (xy) {
-          const t = (performance.now() / 1000) % 1.1 / 1.1;
-          ctx.strokeStyle = `rgba(255, 252, 244, ${(st.pinA * (1 - t)).toFixed(3)})`;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(xy[0], xy[1], 6 + t * 26, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.fillStyle = `rgba(238, 51, 78, ${st.pinA.toFixed(3)})`;
-          ctx.beginPath();
-          ctx.arc(xy[0], xy[1], 5, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = `rgba(255, 255, 255, ${st.pinA.toFixed(3)})`;
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-          label.style.transform = `translate(${xy[0].toFixed(1)}px, ${(xy[1] + 22).toFixed(1)}px) translateX(-50%)`;
-        }
-      }
-      ctx.globalAlpha = 1;
-    }
-    const idx = Math.min(points.length - 1, Math.floor(st.lit));
-    if (idx >= 0) {
-      const y = String(points[idx].year);
-      if (yearEl.textContent !== y) yearEl.textContent = y;
-    }
-  };
-  const isFront = (p: { lon: number; lat: number }) => {
-    const rot = proj.rotate();
-    const toRad = Math.PI / 180;
-    const [l1, p1] = [p.lon * toRad, p.lat * toRad];
-    const [l0, p0] = [-rot[0] * toRad, -rot[1] * toRad];
-    return Math.sin(p0) * Math.sin(p1) + Math.cos(p0) * Math.cos(p1) * Math.cos(l1 - l0) > 0.02;
-  };
-
-  gsap.ticker.add(render);
 
   let finished = false;
   let revealStarted = false;
+  let raf = 0;
+  let tl: gsap.core.Timeline | null = null;
   let resolveDone!: () => void;
   const donePromise = new Promise<void>((r) => (resolveDone = r));
+
+  const globe = (() => {
+    try {
+      return createGlobe(canvas);
+    } catch (e) {
+      console.warn('Intro globe unavailable', e);
+      return null;
+    }
+  })();
+
+  const onResize = () => globe?.resize();
+  window.addEventListener('resize', onResize);
 
   const cleanup = () => {
     if (finished) return;
     finished = true;
-    gsap.ticker.remove(render);
+    cancelAnimationFrame(raf);
+    tl?.kill();
     window.removeEventListener('resize', onResize);
     removeSkipListeners();
+    globe?.dispose();
     root.remove();
     d.classList.remove('intro-lock', 'intro-cover');
     window.__introDone = true;
@@ -174,43 +87,18 @@ export async function playIntro(gamesP: Promise<GameLite[]>): Promise<void> {
     revealStarted = true;
     void revealHero({ fast });
   };
-
-  // Zoom is interpolated in log space so the descent feels like constant-rate falling.
-  const zoom = { p: 0 };
-  const lnZ = Math.log(ZOOM);
-  const tl = gsap.timeline({ defaults: { ease: 'none' } });
-  tl.to(st, { starsA: 1, duration: 0.5, ease: 'power1.out' }, 0)
-    .to(st, { globeA: 1, k: 1, duration: 0.9, ease: 'power3.out' }, 0.05)
-    .to(st, { lon: -28, lat: 26, duration: T.rotate, ease: 'sine.inOut' }, 0)
-    .to(st, { lit: points.length, duration: 1.4, ease: 'none' }, 0.15)
-    .from(yearWrap, { opacity: 0, y: 8, duration: 0.4, ease: 'power2.out' }, 0.15)
-    .to(yearWrap, { opacity: 0, duration: 0.35 }, 1.75)
-    // Phase 2: turn to Milano–Cortina and descend.
-    .to(st, { lon: DESCENT_TARGET.lon, lat: DESCENT_TARGET.lat, duration: 1.0, ease: 'power2.inOut' }, T.rotate)
-    .to(zoom, {
-      p: 1, duration: T.zoomEnd - T.rotate, ease: 'expo.inOut',
-      onUpdate: () => { st.k = Math.exp(lnZ * zoom.p); },
-    }, T.rotate)
-    .to(st, { pinA: 1, duration: 0.3, ease: 'power2.out' }, 2.15)
-    .fromTo(label, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power2.out' }, 2.3)
-    .to([label], { opacity: 0, duration: 0.25 }, 3.05)
-    .to(st, { pinA: 0, duration: 0.25 }, 3.05)
-    // Phase 3: stadium aerial rises out of the city, still descending.
-    .fromTo(stadium, { opacity: 0, scale: 0.1 }, { opacity: 1, duration: 0.4, ease: 'power2.out' }, T.stadium)
-    .to(stadium, { scale: 1.25, duration: T.iris - T.stadium, ease: 'expo.in' }, T.stadium)
-    .to(st, { globeA: 0, duration: 0.6, ease: 'power1.in' }, 3.2)
-    // Phase 4: infield irises open onto the hero.
-    .set(root, { '--iris': '0px' }, T.iris)
-    .call(() => root.classList.add('is-iris'), [], T.iris)
-    .to(stadium, { scale: 3.4, duration: T.end - T.iris, ease: 'power2.in' }, T.iris)
-    .to(root, { '--iris': () => `${Math.ceil(Math.hypot(size.w, size.h) / 2 + 40)}px`, duration: T.end - T.iris, ease: 'power3.in' }, T.iris)
-    .call(() => startReveal(), [], T.reveal)
-    .call(cleanup, [], T.end);
+  /** Bail out to the regular hero reveal (no WebGL / imagery too slow). */
+  const fallback = () => {
+    if (finished) return;
+    removeSkipListeners();
+    startReveal();
+    gsap.to(root, { opacity: 0, duration: 0.3, ease: 'power2.out', onComplete: cleanup });
+  };
 
   // ---------- Skip ----------
   const skip = () => {
     if (finished) return;
-    tl.kill();
+    tl?.kill();
     removeSkipListeners();
     startReveal(true);
     gsap.to(root, { opacity: 0, duration: 0.25, ease: 'power2.out', onComplete: cleanup });
@@ -230,6 +118,67 @@ export async function playIntro(gamesP: Promise<GameLite[]>): Promise<void> {
   function removeSkipListeners(): void {
     listeners.forEach(([t, fn, o]) => window.removeEventListener(t, fn, o));
   }
+
+  if (!globe) {
+    fallback();
+    return donePromise;
+  }
+  canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    if (!finished && !revealStarted) fallback();
+  });
+
+  const ok = await Promise.race([globe.ready, new Promise<boolean>((r) => setTimeout(() => r(false), LOAD_TIMEOUT))]);
+  if (finished) return donePromise;
+  if (!ok) {
+    fallback();
+    return donePromise;
+  }
+
+  // ---------- Camera choreography ----------
+  // lat/lon: slow drift, blended to the target by `turn`. Altitude: log-space, two additive legs.
+  const st = { drift: 0, turn: 0, legA: 0, legB: 0, fade: 0, read: 0 };
+  const lnStart = Math.log(START.alt);
+  const lnMid = Math.log(MID_ALT);
+  let lnEnd = Math.log(globe.altitudeForWidth(END_WIDTH_KM));
+  const cam: Camera = { lat: START.lat, lon: START.lon, alt: START.alt, fade: 0 };
+
+  const frame = () => {
+    if (finished) return;
+    lnEnd = Math.log(globe.altitudeForWidth(END_WIDTH_KM)); // tracks the viewport aspect
+    const lon0 = START.lon + 14 * st.drift;
+    const lat0 = START.lat + 2 * st.drift;
+    cam.lon = lon0 + (TARGET.lon - lon0) * st.turn;
+    cam.lat = lat0 + (TARGET.lat - lat0) * st.turn;
+    cam.alt = Math.exp(lnStart + (lnMid - lnStart) * st.legA + (lnEnd - lnMid) * st.legB);
+    cam.fade = st.fade;
+    globe.draw(cam);
+    if (st.read > 0) {
+      const k = 1 - st.read;
+      coords.textContent = `${fmtLat(TARGET.lat - 0.0386 * k)}  ${fmtLon(TARGET.lon - 0.0517 * k)}`;
+    }
+    raf = requestAnimationFrame(frame);
+  };
+  raf = requestAnimationFrame(frame);
+
+  tl = gsap.timeline({ defaults: { ease: 'none' } });
+  tl.to(st, { fade: 1, duration: 0.6, ease: 'power1.out' }, 0)
+    .fromTo(credit, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 0.2)
+    .to(st, { drift: 1, duration: 2.2, ease: 'sine.out' }, 0)
+    .to(st, { turn: 1, duration: 1.8, ease: 'power2.inOut' }, 0.4)
+    .to(st, { legA: 1, duration: 1.8, ease: 'sine.inOut' }, 0.4)
+    .to(st, { legB: 1, duration: T.land - 2.0, ease: 'power2.inOut' }, 2.0)
+    // Arrival: label, ticking coordinates, pin pulse.
+    .fromTo(label, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, T.label)
+    .to(st, { read: 1, duration: 1.0, ease: 'power2.out' }, T.label)
+    .call(() => pin.classList.add('is-on'), [], T.label + 0.15)
+    .to([label, pin, credit, skipBtn], { opacity: 0, duration: 0.3, ease: 'power1.in' }, T.land + 0.05)
+    // Iris opens onto the hero.
+    .set(root, { '--iris': '0px' }, T.land)
+    .call(() => root.classList.add('is-iris'), [], T.land)
+    .to(root, { '--iris': () => `${Math.ceil(Math.hypot(window.innerWidth, window.innerHeight) / 2 + 40)}px`, duration: T.end - T.land, ease: 'power3.in' }, T.land)
+    .call(() => startReveal(), [], T.reveal)
+    .call(cleanup, [], T.end);
 
   return donePromise;
 }

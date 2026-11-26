@@ -1,11 +1,11 @@
 /**
  * Opening sequence entry point (tiny; lives in the main bundle).
  * The mode is decided by the inline script in index.html (html[data-intro]):
- *   intro   → aerial "camera drop" fly-in, then the hero reveal
+ *   intro   → real-imagery Earth zoom to San Siro (WebGL), then the hero reveal
  *   nointro → ?nointro=1: hero reveal only
  *   reduced → prefers-reduced-motion: a short opacity fade, no transforms
  *   static  → ?static=1: final state immediately
- * Heavy code (GSAP, d3-geo, world atlas) is lazy-loaded so the dashboard boot is never blocked.
+ * Heavy code (GSAP, WebGL globe, imagery) is lazy-loaded so the dashboard boot is never blocked.
  */
 export type IntroMode = 'intro' | 'nointro' | 'reduced' | 'static';
 

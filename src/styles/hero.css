@@ -190,7 +190,7 @@ html.hero-pending .hero__inner,
 html.hero-pending .hero__bands { visibility: hidden; }
 /* Black cover until the intro overlay mounts (prevents a flash of the paper hero). */
 html[data-intro="intro"].intro-cover body::after {
-  content: ""; position: fixed; inset: 0; z-index: 9998; background: #03050d;
+  content: ""; position: fixed; inset: 0; z-index: 9998; background: #000;
 }
 html.intro-lock, html.intro-lock body { overflow: hidden; }
 

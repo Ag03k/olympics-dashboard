@@ -2,6 +2,15 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Hover/press state layers: Material defaults paint an on-surface (near-black) wash over
+   the component. Keep every state layer a faint warm-gold tint so nothing ever darkens. */
+:root {
+  --md-ripple-hover-color: var(--oly-gold);
+  --md-ripple-hover-opacity: 0.06;
+  --md-ripple-pressed-color: var(--oly-gold);
+  --md-ripple-pressed-opacity: 0.10;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   scroll-padding-top: 140px;
@@ -88,6 +97,14 @@ md-tabs {
   --md-primary-tab-container-height: 52px;
   --md-primary-tab-with-icon-and-label-text-container-height: 52px;
   --md-divider-thickness: 0;
+  --md-primary-tab-hover-state-layer-color: var(--oly-gold);
+  --md-primary-tab-hover-state-layer-opacity: 0.06;
+  --md-primary-tab-pressed-state-layer-color: var(--oly-gold);
+  --md-primary-tab-pressed-state-layer-opacity: 0.10;
+  --md-primary-tab-active-hover-state-layer-color: var(--oly-gold);
+  --md-primary-tab-active-hover-state-layer-opacity: 0.06;
+  --md-primary-tab-active-pressed-state-layer-color: var(--oly-gold);
+  --md-primary-tab-active-pressed-state-layer-opacity: 0.10;
   max-width: 380px;
   background: transparent;
 }
@@ -162,6 +179,10 @@ md-slider {
   --md-slider-handle-height: 22px;
   --md-slider-handle-width: 22px;
   --md-slider-state-layer-size: 44px;
+  --md-slider-hover-state-layer-color: var(--md-sys-color-primary);
+  --md-slider-hover-state-layer-opacity: 0.08;
+  --md-slider-pressed-state-layer-color: var(--md-sys-color-primary);
+  --md-slider-pressed-state-layer-opacity: 0.12;
   margin: 0;
 }
 .filters__season { display: flex; align-items: center; gap: 12px; }
@@ -177,6 +198,16 @@ md-filter-chip {
   --md-filter-chip-outline-color: var(--md-sys-color-outline-variant);
   --md-filter-chip-label-text-color: var(--md-sys-color-on-surface-variant);
   --md-filter-chip-leading-icon-color: var(--oly-gold-ink);
+  --md-filter-chip-hover-state-layer-color: var(--oly-gold);
+  --md-filter-chip-hover-state-layer-opacity: 0.06;
+  --md-filter-chip-pressed-state-layer-color: var(--oly-gold);
+  --md-filter-chip-pressed-state-layer-opacity: 0.10;
+  --md-filter-chip-selected-hover-state-layer-color: var(--oly-gold);
+  --md-filter-chip-selected-hover-state-layer-opacity: 0.06;
+  --md-filter-chip-selected-pressed-state-layer-color: var(--oly-gold);
+  --md-filter-chip-selected-pressed-state-layer-opacity: 0.10;
+  --md-filter-chip-hover-label-text-color: var(--md-sys-color-on-surface);
+  --md-filter-chip-selected-hover-label-text-color: var(--md-sys-color-on-primary-container);
   transition: transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 md-filter-chip:active { transform: scale(0.97); }
@@ -211,7 +242,7 @@ md-filter-chip md-icon { --md-icon-size: 18px; }
   content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
   background: var(--accent, var(--oly-ring-blue));
 }
-.stat:hover { --md-elevation-level: 3; transform: translateY(-2px); }
+.stat:hover { --md-elevation-level: 2; transform: translateY(-2px); }
 .stat--silver { --stat-bg: var(--oly-silver-container); --stat-fill: var(--oly-silver); }
 .stat--bronze { --stat-bg: var(--oly-bronze-container); --stat-fill: var(--oly-bronze); }
 .stat--laurel { --stat-bg: #fff4dc; --stat-fill: var(--oly-ring-yellow); }
@@ -359,11 +390,11 @@ md-filter-chip md-icon { --md-icon-size: 18px; }
   border-radius: 24px;
   background: var(--md-sys-color-surface-container-lowest);
   border: 1px solid rgb(122 90 0 / 0.08);
-  transition:
-    transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized),
-    --md-elevation-level var(--md-sys-motion-duration-medium2);
+  transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
-.chart-card:hover { --md-elevation-level: 3; }
+/* Hover = thin gold ring only. No lift (would shift the chart under the cursor/tooltip)
+   and no deeper elevation, so the chart itself is never shaded. */
+.chart-card:hover { border-color: rgb(212 175 55 / 0.45); }
 .chart-card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px 16px; flex-wrap: wrap; padding: 0 4px; }
 .chart-card__titles { min-width: 0; flex: 1 1 260px; }
 .chart-card__title {
@@ -377,7 +408,7 @@ md-filter-chip md-icon { --md-icon-size: 18px; }
 .chart-card__body { position: relative; flex: 1 1 auto; display: flex; flex-direction: column; margin-top: 12px; min-height: 320px; }
 .chart { width: 100%; flex: 1 1 auto; min-height: 340px; position: relative; contain: size layout; overflow: hidden; }
 /* the ECharts canvas must never feed back into layout (prevents a ResizeObserver loop) */
-.chart > div { position: absolute !important; inset: 0; }
+.chart > div:first-child { position: absolute !important; inset: 0; }
 #card-participation .chart { min-height: 400px; }
 #card-hw .chart, #card-age .chart { min-height: 420px; }
 .chart-card__note {
